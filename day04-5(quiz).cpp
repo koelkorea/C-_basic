@@ -39,22 +39,22 @@ int main() {
 	// 3. 각 학생 수만큼 이름, 전화번호 입력받기
 	for (int i = 0; i < studentCnt; i++) {
 
-		cout << "학생 " << setw(3) << i + 1 << "번의 이름을 입력해주세요 : ";
-		cin >> inputName;
+		cout << "학생 " << setw(3) << i + 1 << "번의 이름과 전화번호를 입력해주세요 : ";
+		cin >> inputName >> inputPhoneNumber;
 
 		// 4. 이름, 전화번호 들의 문자열 길이만큼 동적할당 (NULL 문자도 포함해야..)
 		student[i].name = new char[strlen(inputName) + 1];
 
+		// 정적배열에 입력된 이름 문자열을 새로 적은 문자열로 1자씩 복사
 		for (int j = 0; j <= strlen(inputName); j++) {
 			student[i].name[j] = inputName[j];
-		}
 
-		cout << "학생 " << setw(3) << i + 1 << "번의 전화번호을 입력해주세요 : ";
-		cin >> inputPhoneNumber;
+		}
 
 		// 4. 이름, 전화번호 들의 문자열 길이만큼 동적할당 (NULL 문자도 포함해야..)
 		student[i].phoneNumber = new char[strlen(inputPhoneNumber) + 1];
 
+		// 정적배열에 입력된 전화번호 문자열을 새로 적은 문자열로 1자씩 복사
 		for (int j = 0; j <= strlen(inputPhoneNumber); j++) {
 			student[i].phoneNumber[j] = inputPhoneNumber[j];
 		}
@@ -67,9 +67,7 @@ int main() {
 		cout << endl << "학생 " << setw(3) << i + 1 << "번 정보" << endl;
 		cout << " ->> 이름 : " << student[i].name << endl;
 		cout << " ->> 전화번호 : " << setw(3) << student[i].phoneNumber << endl;
-	}
 
-	for (int i = 0; i < studentCnt; i++) {
 		delete[] student[i].name;
 		delete[] student[i].phoneNumber;
 	}
