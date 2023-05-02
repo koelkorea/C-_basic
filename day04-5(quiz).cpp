@@ -25,38 +25,40 @@ int main() {
 	cin >> studentCnt;
 
 	// 2. 학생 수 만큼 성적을 저장 할 메모리 공간 동적 할당
-	// char 포인터변수에 new 연산자를 통한 메모리에 할당하고, 그 시작주소를 포인터변수에 대입 (= 힙 영역에 생성된 char배열의 주소값을 call by reference 형식의 레버런스 변수로 넘겨줌)
+	// STU 구조체 포인터변수에 new 연산자를 통한 메모리에 입력한 학생수에 해당하는 만큼의 크기를 갖는 STU구조체 배열을 할당하고, 그 시작주소를 포인터변수에 대입 
+	// (= 힙 영역에 생성된 STU 구조체의 주소값을 call by reference 형식의 레버런스 변수로 넘겨줌)
 	//  : 자료형 * 변수명 = new 자료형;   <->   malloc(byte 크기), calloc 등을 쓰던 과거아 다름
 	STU* student = new STU[studentCnt];
 
 	cout << endl << "[학생들의 정보]" << endl << endl;
 
-	char name[5];
-	char phoneNumber[13];
+	// 각 입력값 크기에 해당하는 동적크기를 갖는 char배열을 만들기 위해, 일단 입력값 자체를 받기 위한 정적 배열을 하나 만들어 준다
+	char inputName[13];
+	char inputPhoneNumber[13];
 
 	// 3. 각 학생 수만큼 이름, 전화번호 입력받기
 	for (int i = 0; i < studentCnt; i++) {
 
 		cout << "학생 " << setw(3) << i + 1 << "번의 이름을 입력해주세요 : ";
-		cin >> name;
+		cin >> inputName;
 
 		// 4. 이름, 전화번호 들의 문자열 길이만큼 동적할당 (NULL 문자도 포함해야..)
-		student[i].name = new char[strlen(name) + 1];
+		student[i].name = new char[strlen(inputName) + 1];
 
-		for (int j = 0; j <= strlen(name); j++) {
-			student[i].name[j] = name[j];
+		for (int j = 0; j <= strlen(inputName); j++) {
+			student[i].name[j] = inputName[j];
 		}
 
 		cout << "학생 " << setw(3) << i + 1 << "번의 전화번호을 입력해주세요 : ";
-		cin >> phoneNumber;
+		cin >> inputPhoneNumber;
 
 		// 4. 이름, 전화번호 들의 문자열 길이만큼 동적할당 (NULL 문자도 포함해야..)
-		student[i].phoneNumber = new char[strlen(name) + 1];
+		student[i].phoneNumber = new char[strlen(inputPhoneNumber) + 1];
 
-		for (int j = 0; j <= strlen(phoneNumber); j++) {
-			student[i].phoneNumber[j] = phoneNumber[j];
+		for (int j = 0; j <= strlen(inputPhoneNumber); j++) {
+			student[i].phoneNumber[j] = inputPhoneNumber[j];
 		}
-		
+
 	}
 
 	// 5. 각 학생 수만큼 이름, 전화번호 입력받기
