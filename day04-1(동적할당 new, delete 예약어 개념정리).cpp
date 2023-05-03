@@ -7,12 +7,14 @@
 
 //  # C++동적 할당 형식
 //    1. c++ 메모리 동적할당 (malloc, calloc -> new 자료형 예약어를 통한 힙영역에 생성)
-//       : 자료형 * 변수명 = new 자료형;   <->   malloc(byte 크기), calloc 등을 쓰던 과거아 다름
+//       : 자료형 * 변수명 = new 자료형;      <->    malloc(byte 크기), calloc 등을 쓰던 과거아 다름
+//       : 자료형 * 변수명 = new 자료형[n]; 
 
 //         ex) (일반변수) int* ip = new int;  ,  (배열)  int* ip = new int[5];
 
 //    2. c++ 메모리 동적할당 해제(free -> delete 변수명 예약어를 통한 힙영역 메모리 회수)
-//       : delete 변수명;  <->   free 등을 쓰던 과거아 다름
+//       : delete 변수명;      <->     free 등을 쓰던 과거아 다름
+//       : delete[] 변수명; 
 
 //         ex) (일반변수) delete ip;          ,  (배열) delete[] ip;
 
