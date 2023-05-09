@@ -1,4 +1,13 @@
-// getter, setter 개념까지 이용한 c++의 동적할당, 해제 기능으로 'linked list'를 통해 다음의 기능을 가진 코드를 작성해라
+//  #getter, setter와 class포인터를 통한 주의점
+//    1. 멤버함수 get, set 역참조와 get, set을 통한 멤버변수 참조 및 수정은 근본적으로 같은 기능임.. 하지만 충분히 햇갈릴 수 있음..
+//    2. class 객체의 유효범위 = 지역변수의 유효범위임을 명심하자..(= 객체도 일종의 변수이기 때문)
+//    3. (중요!) C++에서 class 포인터와 new연산자를 통한 동적할당을 쓰는 이유?
+//        :  C++에서 동적할당이란 크기가 필요할때마다 가변적으로 조절될 수 있다는 이점을 의미하지만, 다른 한편으로는 {}의 영향을 받지 않고 프로그램에서 메모리를 해제하기 전까지 존재함을 의미함
+//          (= C++에서 new 연산자를 통해 지역객체로서 동적할당을 수행한다면, 2번의 약점을 넘어 전역변수나 전역객체가 아니라도 {}의 한계를 넘어 해당 객체나 변수에 접근이 가능하다!)
+//             -> 동적할당한 메모리에 접근하기 위해서는 그 자료형의 주소값이 필요함 = C++에서 new 연산자를 받는 자료형이 '포인터변수'인 이유
+//    4. 3을 역으로 말하면, main()에서 선언된 class의 객체에 대해서는 동적할당이고 그냥 선언이고 상관이 없음
+
+// class와 getter, setter 개념까지 이용한 c++의 동적할당, 해제 기능으로 'linked list'를 통해 다음의 기능을 가진 코드를 작성해라
 // 1. 학생 정보 등록
 // 2. 학생 정보 삭제
 // 3. 학생 정보 전체 리스트 출력
@@ -11,17 +20,26 @@
 
 using namespace std;
 
+// 학생 정보를 담는 class
 class student {
+
+	// 멤버변수인 이름, 전번은 private로 외부에서 접근불가
 	private:
 		char* name;
 		char* phone;
 
+	// 학생정보 class의 멤버변수를 조작하는 멤버함수는 public
 	public:
+
+		// 학생 class 초기화 함수
+		//  -> 두 멤버변수 전부 NULL
 		inline void init() {
 			name = NULL;
 			phone = NULL;
 		}
 
+		// 해당 학생 클래스의 char*로 동적할당 된 멤버변수 2개 전부 동적해제하는 함수
+		//  -> 멤버 2개 전부 NULL이면, 동작하게 않게 조치 (= 포인터에 기록된 주소값이 NULL인데 뭔 접근이 되겄음?)
 		inline void DeleteData() {
 
 			if (name != NULL) {
@@ -33,79 +51,123 @@ class student {
 			}
 		}
 
+		// char 포인터변수 name의 현 주소값 return함수
 		inline char* getName() {
 			return name;
 		}
 
+		// char 포인터변수 phone의 현 주소값 return함수
 		inline char* getPhone() {
 			return phone;
 		}
 
+		// char 포인터변수 name의 새 주소값을 parameter에 들어온 걸로 갱신해주는 boolean 함수
 		inline bool setName(char* _name) {
 			name = _name;
 			return true;
 		}
 
+		// char 포인터변수 phone의 새 주소값을 parameter에 들어온 걸로 갱신해주는 boolean 함수
 		inline bool setPhone(char* _phone) {
 			phone = _phone;
 			return true;
 		}
 };
 
+// linkedList의 단위가 되는 Node의 단위값으로 student클래스의 포인터변수를 채택
+//  -> 이걸로 student 객체를 선언 후 동적할당할 계획
 typedef student* NodeElement;
 
+// linkedList의 단위가 되는 Node 정보를 담는 class
 class Node {
+
+	// 멤버변수인 노드요소(student 클래스 포인터변수), 다음 Node객체의 주소값을 담는 Node 클래스 포인터변수는 private로 외부에서 접근불가
 	private:
 		NodeElement value;
 		Node* link;
 
+	// 대상 Node class의 멤버변수를 조작하는 멤버함수는 public
 	public:
+
+		// Node class 초기화 함수
+		//  -> 두 멤버변수 전부 NULL
 		void init() {
 			value = NULL;
 			link = NULL;
 		}
 
-		void Delete(){
+		// 해당 Node 클래스의 Node*로 동적할당 된 멤버변수 2개 전부 동적해제하는 함수
+		//  -> 멤버 2개 전부 NULL이면, 동작하게 않게 조치 (= 포인터에 기록된 주소값이 NULL인데 뭔 접근이 되겄음?)
+		void Delete() {
 
-			delete value;
-			delete link;
+			if (value != NULL) {
+				delete value;
+			}
+
+			if (link != NULL) {
+				delete link;
+			}
 		}
 
+		// Node 클래스 포인터변수 value의 현 주소값 return함수
 		inline NodeElement getValue() {
 			return value;
 		}
 
+		// Node 클래스 포인터변수 link의 현 주소값 return함수
 		inline Node* getlink() {
 			return link;
 		}
 
+		// Node 클래스 포인터변수 value의 새 주소값을 parameter에 들어온 걸로 갱신해주는 함수
 		inline void setValue(NodeElement data) {
 			value = data;
 		}
 
+		// Node 클래스 포인터변수 link의 새 주소값을 parameter에 들어온 걸로 갱신해주는 함수
 		inline void setlink(Node* _link) {
 			link = _link;
 		}
 };
 
+// linkedList의 시작점 주소를 점화해주는 헤드 Node의 위치값을 담는 class
 class SingleList {
+
+	// 멤버변수인 1번쨰 Node객체가 위치한 주소값을 담는 Node 클래스 포인터변수인 head는 private로 외부에서 접근불가
 	private:
 		Node* head;
 
+	// 대상 Node class의 멤버변수를 조작하는 멤버함수는 public
 	public:
+
+		// (중요) 헤드는 일단 무조건 존재해야 함(head노드의 위치는 NULL이면 안됨)
 		void init() {
-			head = NULL;
+			head = new Node;
+			head->init();
 		}
 
+		// 해당 Node 클래스의 Node*로 동적할당 된 멤버변수 2개 전부 동적해제하는 함수
+		//  -> 멤버인 head가 NULL이면, 동작하게 않게 조치 (= 포인터에 기록된 주소값이 NULL인데 뭔 접근이 되겄음?)
 		void Delete() {
-			delete head;
-			head = NULL;
+
+			if (head != NULL) {
+				delete head;
+				head = NULL;
+			}
 		}
 
+		// student 객체 포인터변수를 parameter로 받으면, linkedList에 그 student 객체의 정보에 해당하는 노드 추가후 성공하면 연결하여 true 뱉는 함수
 		bool InsertNode(NodeElement data);
+
+		// 출력된 리스트를 보고 순번인 int를 parameter로 받으면, linkedList에 그 순번의 student 객체의 정보에 해당하는 노드 추가후 연결하여 true 뱉는 함수
 		bool DeleteNode(int deleteNodenum);
-		bool DeleteAll();
+
+		// linkedList의 head부터 출발해서, 마지막 노드의 student 객체의 정보를 출력해주고, 출력완료시 총 학생수를 뱉는 함수 
 		int PrintList();
+
+		// linkedList의 모든 Node 정보 및 student객체 삭제하기
+		bool DeleteAll();
+
 };
 
 //---------------------------------------------------기존 cin.clear를 발전시킨 메서드 cinput--------------------------------------------
@@ -152,35 +214,40 @@ void PrintMenu(int& menu, SingleList& head) {
 		// 입력할 학생 수만큼 이름, 전화번호 입력받기
 		for (int i = 0; i < studentCnt; i++) {
 
+			// student 객체 인스턴스 영역을 동적할당하여 생성 후, 그 위치를 student 클래스 포인터에 대입
+			//  -> 현재 입력하는 학생정보(이름, 정보)를 현재 프로그램이 끝날 때까지 유지하고 접근할 목적으로 동적할당
 			student* eachStudent = new student;
-			
+
+			// 동적할당한 student의 인스턴스의 멤버변수인 이름, 전번을 NULL값으로 초기화
 			eachStudent->init();
 
+			// 이름, 전번 정적배열에 입력
 			cout << " ->> " << setw(3) << i + 1 << "번째로 입력할 학생의 '이름'과 '전화번호'를 입력해주세요 : ";
 			cin >> inputName >> inputPhoneNumber;
 
 			//------------------------------[Node에 연결된 STU 구조체에 입력한 이름, 전번 옮기기]---------------------------
 
-			// 이름의 문자열 길이만큼 동적할당 (NULL 문자도 포함해야..)
+			// 이름의 문자열 길이만큼 char의 동적배열을 메모리에 할당하고, 그 시작주소값을 동적할당된 student 인스턴스 위치의 setName()의 patameter로 대입 후 역참조 실행
+			//  -> 해당 student 인스턴스의 멤버변수인 char 포인터인 name의 값을 그 동적할당 char동적배열 시작주소값으로 대입
 			eachStudent->setName(new char[strlen(inputName) + 1]);
 
-			// 정적배열에 입력된 이름 문자열을 새로 적은 문자열로 1자씩 복사
+			// 정적배열에 입력된 이름 문자열을 student 인스턴스의 멤버변수인 char 포인터인 name의 위치를 기준 순차적으로 1자씩 복사
 			for (int j = 0; j <= strlen(inputName); j++) {
 				eachStudent->getName()[j] = inputName[j];
-
 			}
 
-			// 전화번호의 문자열 길이만큼 동적할당 (NULL 문자도 포함해야..)
+			// 이름의 문자열 길이만큼 char의 동적배열을 메모리에 할당하고, 그 시작주소값을 동적할당된 student 인스턴스 위치의 setPhone()의 patameter로 대입 후 역참조 실행
+			//  -> 해당 student 인스턴스의 멤버변수인 char 포인터인 phone의 값을 그 동적할당 char동적배열 시작주소값으로 대입
 			eachStudent->setPhone(new char[strlen(inputPhoneNumber) + 1]);
 
-			// 정적배열에 입력된 전화번호 문자열을 새로 적은 문자열로 1자씩 복사
+			// 정적배열에 입력된 이름 문자열을 student 인스턴스의 멤버변수인 char 포인터인 phone의 위치를 기준 순차적으로 1자씩 복사
 			for (int j = 0; j <= strlen(inputPhoneNumber); j++) {
 				eachStudent->getPhone()[j] = inputPhoneNumber[j];
 			}
 
 			//--------------------------------------------------------------------------------------------------------------
 
-			// 입력 메서드에 입력한 학생 해당 정보와, Linked의 시작인 head노드의 시작주소값을 가지는 Node포인터변수를 param으로 수행
+			// 현 함수의 parameter인 LinkedList의 헤드노드 주소를 가지는 head(SingleList 클래스의 인스턴스)의 멤버함수 insertNode에 eachstudent( 동적할당하여 멤버변수 값을 넣은 student 클래스의 인스턴스)를 parameter로 넣어 실행 
 			//  -> 성공 실패 여부에따라 알림 달라지게 함
 			if (head.InsertNode(eachStudent) == true) {
 				cout << "\t>>>> (알림) 학생 " << i + 1 << "의 정보가 입력 완료.." << endl << endl;
@@ -305,6 +372,7 @@ int main() {
 
 
 // 1. 개별 학생의 이름, 전화번호를 가진 student 클래스를 데이터로 삼는 Node를 생성하고 그 노드를 linked리스트에 추가 
+//    -> 'student 객체 포인터변수'를 parameter로 받으면, linkedList에 그 student 객체의 정보에 해당하는 노드 추가후 성공하면 연결하여 true 뱉는 함수
 bool SingleList::InsertNode(NodeElement data) {
 
 	bool flag = false;
@@ -312,23 +380,27 @@ bool SingleList::InsertNode(NodeElement data) {
 	// 입력할 이름, 전화번호가 NULL이 아니면, 입력과정 진행
 	if (data->getName() != NULL && data->getPhone() != NULL) {
 
-		// 현재 linkedlist의 마지막으로 붙은 노드를 찾기위한 Node 포인터변수 tmp (head노드의 주소값으로 초기화)
+		// 현재 linkedlist의 마지막으로 붙은 노드를 찾기위한 Node 포인터변수 tmp (현 SingleList 객체의 멤버변수인 Node 클래스 포인터변수인 head(head노드의 주소값)로 초기화)
 		Node* tmp = head;
-		
-		// head에 붙어있는 노드를 의미하는 tmp->link를 시작으로 NULL이 나올때까지, tmp의 Node주소값을 tmp->link로 갱신
+
+		// head에 붙어있는 1번째 노드를 의미하는 tmp->getlink()를 시작으로 NULL이 나올때까지, tmp의 Node주소값을 tmp->getlink()->getLink()로 갱신
 		while (tmp->getlink() != NULL) {
 
 			tmp = tmp->getlink();
 		}
 
-		// 추가해줄 STU 구조체(new Node 할 때 같이 생성)를 가지는 linkedlist 생성
+		// LinkedList에 추가해줄 Node 객체를 동적할당하고, Node객체가 위치한 메모리 위치를 Node 객체 포인터변수 studentLinkedNode에 대입
 		Node* studentLinkedNode = new Node;
+
+		// 해당 Node객체의 멤버변수들을 Null로 초기화
 		studentLinkedNode->init();
 
-		// 새로 만든 Node의 주소값를 기존 마지막의 link에 대입
+		// (기존 노드 link값 수정) 새로 만든 Node의 주소값을 기존 마지막Node가 위치값을 가지는 Node객체 포인터변수 tmp를 역참조하여 실행한 setlink()의 parameter로 투입
+		//  -> 현 마지막 노드에 연결된 Node의 주소값인 link 값을 생성된 Node객체가 위치한 주소값으로 갱신 
 		tmp->setlink(studentLinkedNode);
 
-		// 새로 추가할 학생의 이름, 전화번호를 Node와 연결된 STU에 추가 + 추가된 노드의 다음 Node 주소값은 NULL
+		// (새로운 마지막 노드에 value값을 갱신) parameter를 통해 전달된 입력된 이름, 전번이가 위치한 student 객체의 주소값
+		//  -> 해당 student 객체의 주소값을 현 마지막 노드로 생성된 Node 객체의 value값으로 대입(studentLinkedNode를 역참조하여 실행한 setlink()의 parameter로 투입)
 		studentLinkedNode->setValue(data);
 
 		flag = true;
@@ -338,6 +410,7 @@ bool SingleList::InsertNode(NodeElement data) {
 }
 
 // 2. 특정 학생의 정보들 모두를 삭제하는 기능(그 학생정보가 있는 Node를 메모리 해제)
+//    -> 출력된 리스트를 보고 순번인 int를 parameter로 받으면, linkedList에 그 순번의 student 객체의 정보에 해당하는 노드 추가후 연결하여 true 뱉는 함수
 bool SingleList::DeleteNode(int deleteNodenum) {
 
 	bool flag = true;
@@ -363,6 +436,8 @@ bool SingleList::DeleteNode(int deleteNodenum) {
 		if (i == deleteNodenum - 1) {
 
 			// 삭제할 노드의 주소를 받을 tmpForDelete에 삭제노드의 주소를 대입(삭제 전 노드의 link에 입력된 주소값)
+			//  -> 삭제 노드를 미리 지정하는 이유
+			//     : 1번째 노드가 마지막 노드일때도 head를 기준으로 해당 노드값을 얻을 수 있게 삭제 가능하게 하기 위함 (그전에는 1번노드의 경우 head->getlink() 이런식으로 예외처리 지정)
 			tmpForDelete = tmpForCursor->getlink();
 
 			// 삭제할 노드의 다음 노드가 마지막 노드가 아니라면? (= 삭제할 노드가 리스트의 중간에 위치)
@@ -380,11 +455,11 @@ bool SingleList::DeleteNode(int deleteNodenum) {
 
 		}
 
-		// 헤드 = 0이고, 루프가 끝날때, 다음 노드로 갱신
+		// 루프가 끝날때, 다음 노드로 갱신 (시작인 0의미 = 헤드노드의 주소값)
 		tmpForCursor = tmpForCursor->getlink();
 	}
 
-	// 삭제노드의 주속값이 들어간 tmpForDelete의 주소를 이용해 메모리 해제
+	// 삭제노드의 주소값이 들어간 tmpForDelete의 주소를 이용해 Node 객체의 메모리 해제
 	delete tmpForDelete;
 
 
@@ -392,6 +467,7 @@ bool SingleList::DeleteNode(int deleteNodenum) {
 }
 
 // 3. 전체 학생정보 출력 (몇 명의 학생이 존재하는지를 반환)
+//    -> linkedList의 head부터 출발해서, 마지막 노드의 student 객체의 정보를 출력해주고, 출력완료시 총 학생수를 뱉는 함수 
 int SingleList::PrintList() {
 
 	// 현재 리스트의 학생수를 받을 변수
@@ -401,7 +477,7 @@ int SingleList::PrintList() {
 	Node* tmp = head;
 
 	// 노드에 연결된 다른 노드의 주소값인 link가 NULL이 나오는 녀석까지 노드의 주소값을 받을 변수
-	while (tmp != NULL) {
+	while (tmp->getlink() != NULL) {
 
 		tmp = tmp->getlink();
 
@@ -418,6 +494,7 @@ int SingleList::PrintList() {
 }
 
 // 4. 전체 학생정보 삭제
+//    -> linkedList의 모든 Node 정보 및 student객체 삭제하기
 bool SingleList::DeleteAll() {
 
 	bool flag = false;
