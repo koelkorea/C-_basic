@@ -110,8 +110,6 @@ class Node {
 		//  -> 멤버 2개 전부 NULL이면, 동작하게 않게 조치 (= 포인터에 기록된 주소값이 NULL인데 뭔 접근이 되겄음?)
 		~Node() {
 
-			cout << " ->> 이름이 " << this->getValue()->getName() << "인 학생정보 Node 삭제 완료!!" << endl;
-
 			if (value != NULL) {
 				// delete 포인터 : 해당 포인터에 존재 및 연계된 포인터가 가르키는 동적할당된 객체를 제거한다 (소멸자에 잘못쓰면 연쇄 삭제 일어남..)
 				delete value;
@@ -120,16 +118,23 @@ class Node {
 			link = NULL;
 		}
 
-		// 특정 노드 포함 이후 모든 노드 삭제기능 (일단 헤드만 가능하게..)
+		// ---------------------------------------(추가) 해당 멤버함수를 실행한 노드를 포함 이후 모든 노드 삭제기능 (일단 헤드만 가능하게..)------------------------------------------
 		void allNodeDelete() {
 
 			if (link != NULL) {
 				link->allNodeDelete();
 			}
 
+			if (this->getValue() != NULL) {
+				cout << " ->> 이름이 " << this->getValue()->getName() << "인 학생정보 Node 삭제 완료!!" << endl;
+			}else {
+				cout << " ->> 헤드Node 삭제 완료!!" << endl;
+			}
+
 			// delete 포인터 : 해당 포인터에 존재 및 연계된 포인터가 가르키는 동적할당된 객체를 제거한다 (소멸자에 잘못쓰면 연쇄 삭제 일어남..)
 			delete this;
 		}
+		// ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 		// Node 클래스 포인터변수 value의 현 주소값 return함수
 		inline NodeElement getValue() {
@@ -173,7 +178,13 @@ class SingleList {
 		~SingleList() {
 
 			if (head != NULL) {
-				delete head;
+
+				head->allNodeDelete();
+
+				//----------[소멸자에 allNodeDelete 적용전]------------
+				// delete head;
+				//-----------------------------------------------------
+				
 				head = NULL;
 			}
 		}
@@ -181,8 +192,11 @@ class SingleList {
 		// student 객체 포인터변수를 parameter로 받으면, linkedList에 그 student 객체의 정보에 해당하는 노드 추가후 성공하면 연결하여 true 뱉는 함수
 		bool InsertNode(NodeElement data);
 
-		// 출력된 리스트를 보고 순번인 int를 parameter로 받으면, linkedList에 그 순번의 student 객체의 정보에 해당하는 노드 추가후 연결하여 true 뱉는 함수
+		// 출력된 리스트를 보고 순번인 int를 parameter로 받으면, linkedList에 그 순번의 student 객체의 정보에 해당하는 노드 삭제하여 true 뱉는 함수
 		bool DeleteNode(int deleteNodenum);
+
+		// (추가) 출력된 리스트를 보고 순번인 int를 parameter로 받으면, 그 linkedList에 그 순번 이후의 student 객체의 정보에 해당하는 노드 전부를 삭제하여 true 뱉는 함수
+		bool DeleteNumAfter(int deleteNodenum);
 
 		// linkedList의 head부터 출발해서, 마지막 노드의 student 객체의 정보를 출력해주고, 출력완료시 총 학생수를 뱉는 함수 
 		int PrintList();
@@ -279,10 +293,10 @@ void PrintMenu(int& menu, SingleList*& head) {
 		// 리스트의 학생이 1명 이상 존재할 시, 개별학생 삭제기능 수행!
 		if (deleteFlag != 0) {
 
+			cout << endl << "[2번. 개별 학생정보 입력기능]" << endl;
+
 			// 삭제할 학생이 몇번째에 있을지 받을 변수
 			int deleteNodenum = 0;
-
-			cout << endl << "[2번. 개별 학생정보 입력기능]" << endl;
 
 			// 최소한 1번은 삭제할 학생의 index 입력받는데, 그 값이 0보다 크면서, deleteFlag의 값보다 같거나 커야함 (= 삭제 가능 학생index를 입력받으라는 말)
 			do {
@@ -295,14 +309,36 @@ void PrintMenu(int& menu, SingleList*& head) {
 
 			} while (deleteNodenum <= 0 && deleteNodenum > deleteFlag);
 
-			// 삭제 메서드에  Linked의 시작인 head노드의 지울 학생이 몇번째에 있는지 여부를 param으로 수행
-			//  -> 성공 실패 여부에따라 알림 달라지게 함
-			if (head->DeleteNode(deleteNodenum) == true) {
+			// 특정 노드만 지울지? 아니면 그 노드 이후까지 전부 지울지 여부
+			cout << endl << " ->> (주의!) 해당 순번의 학생만 지울까요? 아니면 그 학생 뒷쪽 순번 학생까지 다 지울까요? (0 : 해당 순번 학생만 지우기): ";
+			int allorEach = 0;
+			cinput(allorEach);
 
-				cout << "\t>>>> (알림) " << deleteNodenum << "번째 학생 정보 삭제 완료!" << endl << endl;
+			// 해당 노드만 삭제여부에 따라 메서드 갈림 
+			if (allorEach == 0) {
+
+				// 삭제 메서드에  Linked의 시작인 head노드의 지울 학생이 몇번째에 있는지 여부를 param으로 수행
+				//  -> 성공 실패 여부에따라 알림 달라지게 함
+				if (head->DeleteNode(deleteNodenum) == true) {
+
+					cout << "\t>>>> (알림) " << deleteNodenum << "번째 학생 정보 삭제 완료!" << endl << endl;
+				}
+				else {
+					cout << "\t>>>> (알림) " << deleteNodenum << "번째 학생 정보 삭제 실패!" << endl << endl;
+				}
+
 			}
 			else {
-				cout << "\t>>>> (알림) " << deleteNodenum << "번째 학생 정보 삭제 실패!" << endl << endl;
+
+				// 삭제 수행 여부에 따라, 성공문구 출력
+				if (head->DeleteNumAfter(deleteNodenum) == true) {
+
+					cout << "\t>>>> (알림) " << deleteNodenum << "번째 학생부터 마지막 학생정보까지 삭제 완료!" << endl << endl;
+				}
+				else {
+					cout << "\t>>>> (알림) " << deleteNodenum << "번째 학생부터 마지막 학생정보까지 삭제 실패!" << endl << endl;
+				}
+
 			}
 		}
 		// 리스트의 학생이 0명이면, 삭제 불가 판정
@@ -326,19 +362,58 @@ void PrintMenu(int& menu, SingleList*& head) {
 	// 4. 전체 학생정보 삭제기능
 	else if (menu == 4) {
 
-		// 삭제 수행 여부에 따라, 성공문구 출력
-		if (head->DeleteAll() == true) {
-			cout << "\t>>>> (알림) 학생 정보 전체 삭제완료!" << endl << endl;
-		}
-		else {
-			cout << "\t>>>> (알림) 학생 정보가 없거나, 전체 삭제 실패!" << endl << endl;
+		//----------------------------------------------------------------[allNodeDelete기반 DeleteNumAfter 적용전]-------------------------------------------------------------
+		// if (head->DeleteAll() == true) {
+		// 	cout << "\t>>>> (알림) 학생 정보 전체 삭제완료!" << endl << endl;
+		// }
+		// else {
+		// 	cout << "\t>>>> (알림) 학생 정보가 없거나, 전체 삭제 실패!" << endl << endl;
+		// }
+		//----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+		// 데이터가 존재하는것 확인 + 삭제 수행 여부에 따라, 성공문구 출력
+		if (head->PrintList() > 0) {
+
+			cout << " ->> 해당 순번의 학생만 지울까요 ? 아니면 그 학생 뒷쪽 순번 학생까지 다 지울까요 ? (0 : 해당 순번 학생만 지우기) : ";
+
+			int allDeleteFlag = 1;
+			cinput(allDeleteFlag);
+
+			if (allDeleteFlag == 0) {
+
+				if (head->DeleteNumAfter(1) == true) {
+					cout << "\t>>>> (알림) 학생 정보 전체 삭제완료!" << endl << endl;
+				}
+				else {
+					cout << "\t>>>> (알림) 학생 정보 전체 삭제실패!" << endl << endl;
+				}
+
+			}else {
+				cout << "\t>>>> (알림) 학생 정보 전체 삭제명령을 취소하셨습니다." << endl << endl;
+			}
+			
+		}else {
+			cout << "\t>>>> (알림) 학생 정보가 없어서 삭제를 할 수 없습니다!" << endl << endl;
 		}
 
 	}
 	else if (menu == 5) {
 
-		// 종료 전에 전역변수인 LinkedList의 head에 할당된 메모리 해제를 잊지마라 
-		head->DeleteAll();
+		//----------------------------------------------------------------[SingleList 소멸자에 allNodeDelete 적용전]-------------------------------------------------------------
+		// (데이터가 있다면) LinkedList의 남은 노드 모두 종료 
+		//if (head->PrintList() > 0) {
+
+		//	if (head->DeleteNumAfter(1) == true) {
+		//		cout << "\t>>>> (알림) 학생 정보 전체 삭제완료!" << endl << endl;
+		//	}
+		//	else {
+		//		cout << "\t>>>> (알림) 학생 정보 전체 삭제실패!" << endl << endl;
+		//	}
+		//}
+		//------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+		// 종료 전에 LinkedList의 SingleList 클래스 기반 동적객체 head노드에 할당된 메모리 해제를 잊지마라 
+		delete head;
 
 		cout << "\t>>>> (알림) 학생관리 프로그램을 종료합니다..." << endl << endl;
 
@@ -352,7 +427,7 @@ int main() {
 	// 학생정보 LinkedList를 시작할 SingleList 클래스 객체를 생성자 함수를 통해 생성후 동적할당(멤벼변수인 head노드까지 생성하고 초기화후 동적할당)하여 
 	//  -> 그 메모리 위치를 SingleList 객체 포인터변수 LinkedHead에 대입
 	//     (= head의 link는 일단 NULL 초기화.. 등록된 학생정보가 없기 때문)
-	SingleList* LinkedHead = new SingleList();
+	SingleList* LinkedHead = new SingleList;
 
 	// 메뉴수행 번호 받아줄 변수 (초기값 0)
 	int menuNum = 0;
@@ -368,7 +443,6 @@ int main() {
 
 		cinput(menuNum);
 		PrintMenu(menuNum, LinkedHead);
-
 	}
 
 	return 0;
@@ -463,9 +537,9 @@ bool SingleList::DeleteNode(int deleteNodenum) {
 	// 삭제노드의 주소값이 들어간 tmpForDelete의 주소를 이용해 Node 객체의 메모리 해제
 	delete tmpForDelete;
 
-
 	return flag;
 }
+
 
 // 3. 전체 학생정보 출력 (몇 명의 학생이 존재하는지를 반환)
 //    -> linkedList의 head부터 출발해서, 마지막 노드의 student 객체의 정보를 출력해주고, 출력완료시 총 학생수를 뱉는 함수 
@@ -494,8 +568,53 @@ int SingleList::PrintList() {
 	return studentNum;
 }
 
-// 4. 전체 학생정보 삭제
-//    -> linkedList의 모든 Node 정보 및 student객체 삭제하기
+// 4. (보완) 특정 학생을 포함한 그 뒤의 리스트 모두를 삭제하는 기능 (전체 노드 삭제기능 포함)
+//    -> 출력된 리스트를 보고 순번인 int를 parameter로 받으면, 그 linkedList에 그 순번 이후의 student 객체의 정보에 해당하는 노드 전부를 삭제하여 true 뱉는 함수
+bool SingleList::DeleteNumAfter(int deleteNodenum) {
+
+	bool flag = true;
+
+	// 사용자가 0을 입력했을때, 에러를 피하도록 조치 (물론 애초에 0 < deleteNodenum < print에 찍힌 return값 이도록 조치)
+	if (deleteNodenum == 0) {
+
+		// 경고문과 함께 false입력
+		cout << "\t>>>> (경고!) 0번째 데이터는 존재하지 않는 데이터이므로 삭제할 수 없습니다." << endl;
+		return flag = false;
+	}
+
+	// 노드의 주소값을 찍을 커서로서 linkedList용 노드포인터
+	Node* tmpForCursor = head;
+
+	// 삭제 노드의 주소값을 저장할 linkedList용 노드포인터 (NULL로 초기화 시켜놓음.. tmpForCursor를 직접 삭제 안하는 이유는.. 그 초기값이 head라 예측못한 경우의 수에 head가 지워질수 있음)
+	Node* tmpForDelete = NULL;
+
+	// linkedList 헤드 = 0, deleteNodenum에 해당하는 횟수만큼 link를 타서, tmpForDelete값을 찍을 예정
+	for (int i = 0; i < deleteNodenum; i++) {
+
+		// 삭제할 노드의 위치 전에 위치한 노드에 도달할 경우?
+		if (i == deleteNodenum - 1) {
+
+			// 삭제할 노드의 주소를 받을 tmpForDelete에 삭제노드의 주소를 대입(삭제 전 노드의 link에 입력된 주소값)
+			//  -> 삭제 노드를 미리 지정하는 이유
+			//     : 1번째 노드가 마지막 노드일때도 head를 기준으로 해당 노드값을 얻을 수 있게 삭제 가능하게 하기 위함 (그전에는 1번노드의 경우 head->getlink() 이런식으로 예외처리 지정)
+			tmpForDelete = tmpForCursor->getlink();
+
+			// 삭제할 노드 이전노드의 link를 NULL로 저장 (전부 지울계획)
+			tmpForCursor->setlink(NULL);
+
+		}
+		// 루프가 끝날때, 다음 노드로 갱신 (시작인 0의미 = 헤드노드의 주소값)
+		tmpForCursor = tmpForCursor->getlink();
+	}
+
+	// 삭제노드의 주소값이 들어간 tmpForDelete의 주소를 이용해 Node 객체의 메모리 해제
+	tmpForDelete->allNodeDelete();
+
+	return flag;
+}
+
+
+//-----------------------------------------------------[구 전체학생 삭제]---------------------------------------------------------------
 bool SingleList::DeleteAll() {
 
 	bool flag = false;
@@ -506,7 +625,10 @@ bool SingleList::DeleteAll() {
 		flag = true;
 
 		// Node 객체의 재귀메서드를 통한 전노드 삭제 기능 구현
-		head->allNodeDelete();
+		head->getlink()->allNodeDelete();
+
+		// 다 삭제했으면, head의 link 멤버를 null로..
+		head->setlink(NULL);
 
 	}
 	else {
@@ -516,7 +638,6 @@ bool SingleList::DeleteAll() {
 	return flag;
 }
 
-//-----------------------------------------------------[구 전체학생 삭제]---------------------------------------------------------------
 bool SingleList::DeleteAll_old() {
 
 	bool flag = false;
@@ -549,4 +670,3 @@ bool SingleList::DeleteAll_old() {
 
 
 }
-
