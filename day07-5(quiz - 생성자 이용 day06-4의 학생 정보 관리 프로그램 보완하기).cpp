@@ -1,4 +1,4 @@
-//  #getter, setter와 class포인터를 통한 주의점
+//  # getter, setter와 class포인터를 통한 주의점
 //    1. 멤버함수 get, set 역참조와 get, set을 통한 멤버변수 참조 및 수정은 근본적으로 같은 기능임.. 하지만 충분히 햇갈릴 수 있음..
 //    2. class 객체의 유효범위 = 지역변수의 유효범위임을 명심하자..(= 객체도 일종의 변수이기 때문)
 //    3. (중요!) C++에서 class 포인터와 new연산자를 통한 동적할당을 쓰는 이유?
@@ -110,13 +110,25 @@ class Node {
 		//  -> 멤버 2개 전부 NULL이면, 동작하게 않게 조치 (= 포인터에 기록된 주소값이 NULL인데 뭔 접근이 되겄음?)
 		~Node() {
 
+			cout << " ->> 이름이 " << this->getValue()->getName() << "인 학생정보 Node 삭제 완료!!" << endl;
+
 			if (value != NULL) {
+				// delete 포인터 : 해당 포인터에 존재 및 연계된 포인터가 가르키는 동적할당된 객체를 제거한다 (소멸자에 잘못쓰면 연쇄 삭제 일어남..)
 				delete value;
 			}
 
+			link = NULL;
+		}
+
+		// 특정 노드 포함 이후 모든 노드 삭제기능 (일단 헤드만 가능하게..)
+		void allNodeDelete() {
+
 			if (link != NULL) {
-				delete link;
+				link->allNodeDelete();
 			}
+
+			// delete 포인터 : 해당 포인터에 존재 및 연계된 포인터가 가르키는 동적할당된 객체를 제거한다 (소멸자에 잘못쓰면 연쇄 삭제 일어남..)
+			delete this;
 		}
 
 		// Node 클래스 포인터변수 value의 현 주소값 return함수
@@ -177,6 +189,8 @@ class SingleList {
 
 		// linkedList의 모든 Node 정보 및 student객체 삭제하기
 		bool DeleteAll();
+		bool DeleteAll_old();
+
 };
 
 //---------------------------------------------------기존 cin.clear를 발전시킨 메서드 cinput--------------------------------------------
@@ -204,12 +218,12 @@ void cinput(char& n) {
 //-------------------------------------------------------------------------------------------------------------------------------------
 
 // 메뉴 입력화면에서 메뉴를 받으면 조건부로 기능진행
-void PrintMenu(int& menu, SingleList& head) {
+void PrintMenu(int& menu, SingleList*& head) {
 
 	// 1. 학생정보 입력기능
 	if (menu == 1) {
 
-		// -----------------------------------------------------[학생 정보 STU 생성 & 작성]--------------------------------------------------------------------------
+		// -----------------------------------------------------[학생 정보 작성]--------------------------------------------------------------------------
 		// 학생 수 입력 받기
 		int studentCnt;
 
@@ -223,42 +237,30 @@ void PrintMenu(int& menu, SingleList& head) {
 		// 입력할 학생 수만큼 이름, 전화번호 입력받기
 		for (int i = 0; i < studentCnt; i++) {
 
-			// student 객체 인스턴스 영역을 동적할당하여 생성 후, 그 위치를 student 클래스 포인터에 대입
-			//  -> 현재 입력하는 학생정보(이름, 정보)를 현재 프로그램이 끝날 때까지 유지하고 접근할 목적으로 동적할당
-			student* eachStudent = new student;
-
-			// 동적할당한 student의 인스턴스의 멤버변수인 이름, 전번을 NULL값으로 초기화
-			eachStudent->init();
-
 			// 이름, 전번 정적배열에 입력
 			cout << " ->> " << setw(3) << i + 1 << "번째로 입력할 학생의 '이름'과 '전화번호'를 입력해주세요 : ";
 			cin >> inputName >> inputPhoneNumber;
 
-			//------------------------------[Node에 연결된 STU 구조체에 입력한 이름, 전번 옮기기]---------------------------
+			//------------------------------[student class객체 생성 + 입력한 이름, 전번 객체의 멤버변수로 옮기기]---------------------------
 
 			// 이름의 문자열 길이만큼 char의 동적배열을 메모리에 할당하고, 그 시작주소값을 동적할당된 student 인스턴스 위치의 setName()의 patameter로 대입 후 역참조 실행
 			//  -> 해당 student 인스턴스의 멤버변수인 char 포인터인 name의 값을 그 동적할당 char동적배열 시작주소값으로 대입
-			eachStudent->setName(new char[strlen(inputName) + 1]);
 
-			// 정적배열에 입력된 이름 문자열을 student 인스턴스의 멤버변수인 char 포인터인 name의 위치를 기준 순차적으로 1자씩 복사
-			for (int j = 0; j <= strlen(inputName); j++) {
-				eachStudent->getName()[j] = inputName[j];
-			}
 
-			// 이름의 문자열 길이만큼 char의 동적배열을 메모리에 할당하고, 그 시작주소값을 동적할당된 student 인스턴스 위치의 setPhone()의 patameter로 대입 후 역참조 실행
-			//  -> 해당 student 인스턴스의 멤버변수인 char 포인터인 phone의 값을 그 동적할당 char동적배열 시작주소값으로 대입
-			eachStudent->setPhone(new char[strlen(inputPhoneNumber) + 1]);
+			// 'name', 'phoneNumber' 만큼의 char 크기만큼의 동적배열을 메모리에 할당하여 생성 후,  
+			//  -> 그들의 char 포인터값을 생성자 함수의 parameter로 대입하여 student 객체 인스턴스의 멤버변수 값으로 대입하여 객체 생성
+			//     (= 현재 입력하는 학생정보(이름, 정보)를 현재 프로그램이 끝날 때까지 유지하고 접근할 목적으로 동적할당 + 객체 생성까지 세트메뉴로 완료하는 편한 방법)
+			student* eachStudent = new student(new char[strlen(inputName) + 1], new char[strlen(inputPhoneNumber) + 1]);
 
-			// 정적배열에 입력된 이름 문자열을 student 인스턴스의 멤버변수인 char 포인터인 phone의 위치를 기준 순차적으로 1자씩 복사
-			for (int j = 0; j <= strlen(inputPhoneNumber); j++) {
-				eachStudent->getPhone()[j] = inputPhoneNumber[j];
-			}
+			// trcpy 함수를 통해 문자열 복사
+			strcpy_s(eachStudent->getName(), strlen(inputName) + 1, inputName);
+			strcpy_s(eachStudent->getPhone(), strlen(inputPhoneNumber) + 1, inputPhoneNumber);
 
 			//--------------------------------------------------------------------------------------------------------------
 
 			// 현 함수의 parameter인 LinkedList의 헤드노드 주소를 가지는 head(SingleList 클래스의 인스턴스)의 멤버함수 insertNode에 eachstudent( 동적할당하여 멤버변수 값을 넣은 student 클래스의 인스턴스)를 parameter로 넣어 실행 
 			//  -> 성공 실패 여부에따라 알림 달라지게 함
-			if (head.InsertNode(eachStudent) == true) {
+			if (head->InsertNode(eachStudent) == true) {
 				cout << "\t>>>> (알림) 학생 " << i + 1 << "의 정보가 입력 완료.." << endl << endl;
 			}
 			else {
@@ -272,7 +274,7 @@ void PrintMenu(int& menu, SingleList& head) {
 	else if (menu == 2) {
 
 		// 리스트의 학생 수 받음
-		int deleteFlag = head.PrintList();
+		int deleteFlag = head->PrintList();
 
 		// 리스트의 학생이 1명 이상 존재할 시, 개별학생 삭제기능 수행!
 		if (deleteFlag != 0) {
@@ -295,7 +297,7 @@ void PrintMenu(int& menu, SingleList& head) {
 
 			// 삭제 메서드에  Linked의 시작인 head노드의 지울 학생이 몇번째에 있는지 여부를 param으로 수행
 			//  -> 성공 실패 여부에따라 알림 달라지게 함
-			if (head.DeleteNode(deleteNodenum) == true) {
+			if (head->DeleteNode(deleteNodenum) == true) {
 
 				cout << "\t>>>> (알림) " << deleteNodenum << "번째 학생 정보 삭제 완료!" << endl << endl;
 			}
@@ -312,7 +314,7 @@ void PrintMenu(int& menu, SingleList& head) {
 	else if (menu == 3) {
 
 		// 리스트의 학생이 1명 이상 존재할 시, 성공문구 출력
-		if (head.PrintList() != 0) {
+		if (head->PrintList() != 0) {
 
 			cout << "\t>>>> (알림) 학생 정보 출력완료!" << endl << endl;
 		}
@@ -325,8 +327,7 @@ void PrintMenu(int& menu, SingleList& head) {
 	else if (menu == 4) {
 
 		// 삭제 수행 여부에 따라, 성공문구 출력
-		if (head.DeleteAll() == true) {
-
+		if (head->DeleteAll() == true) {
 			cout << "\t>>>> (알림) 학생 정보 전체 삭제완료!" << endl << endl;
 		}
 		else {
@@ -337,8 +338,7 @@ void PrintMenu(int& menu, SingleList& head) {
 	else if (menu == 5) {
 
 		// 종료 전에 전역변수인 LinkedList의 head에 할당된 메모리 해제를 잊지마라 
-		head.DeleteAll();
-		head.Delete();
+		head->DeleteAll();
 
 		cout << "\t>>>> (알림) 학생관리 프로그램을 종료합니다..." << endl << endl;
 
@@ -349,12 +349,10 @@ void PrintMenu(int& menu, SingleList& head) {
 
 int main() {
 
-	// 학생정보 LinkedList를 시작할 head 생성
-	//  : 소속 STU없음.. link는 1번째 노드가 있으면 그 노드주소.. 없으면 NULL
-	SingleList LinkedHead;
-
-	// LinkedList의 head의 link는 일단 NULL 초기화.. (등록된 학생정보가 없음)
-	LinkedHead.init();
+	// 학생정보 LinkedList를 시작할 SingleList 클래스 객체를 생성자 함수를 통해 생성후 동적할당(멤벼변수인 head노드까지 생성하고 초기화후 동적할당)하여 
+	//  -> 그 메모리 위치를 SingleList 객체 포인터변수 LinkedHead에 대입
+	//     (= head의 link는 일단 NULL 초기화.. 등록된 학생정보가 없기 때문)
+	SingleList* LinkedHead = new SingleList();
 
 	// 메뉴수행 번호 받아줄 변수 (초기값 0)
 	int menuNum = 0;
@@ -398,19 +396,13 @@ bool SingleList::InsertNode(NodeElement data) {
 			tmp = tmp->getlink();
 		}
 
-		// LinkedList에 추가해줄 Node 객체를 동적할당하고, Node객체가 위치한 메모리 위치를 Node 객체 포인터변수 studentLinkedNode에 대입
-		Node* studentLinkedNode = new Node;
-
-		// 해당 Node객체의 멤버변수들을 Null로 초기화
-		studentLinkedNode->init();
+		// LinkedList에 추가해줄 Node 객체를 동적할당하고 생성자함수의 parameter로 학생정보에 해당하는 parameter를 통해 전달된 입력된 이름, 전번이 위치한 student 객체의 주소값인 data만 제외 link의 주소값은 NULL로 투입
+		//  -> 그 메모리 위치를 Node 객체 포인터변수 studentLinkedNode에 대입
+		Node* studentLinkedNode = new Node(data, NULL);
 
 		// (기존 노드 link값 수정) 새로 만든 Node의 주소값을 기존 마지막Node가 위치값을 가지는 Node객체 포인터변수 tmp를 역참조하여 실행한 setlink()의 parameter로 투입
 		//  -> 현 마지막 노드에 연결된 Node의 주소값인 link 값을 생성된 Node객체가 위치한 주소값으로 갱신 
 		tmp->setlink(studentLinkedNode);
-
-		// (새로운 마지막 노드에 value값을 갱신) parameter를 통해 전달된 입력된 이름, 전번이가 위치한 student 객체의 주소값
-		//  -> 해당 student 객체의 주소값을 현 마지막 노드로 생성된 Node 객체의 value값으로 대입(studentLinkedNode를 역참조하여 실행한 setlink()의 parameter로 투입)
-		studentLinkedNode->setValue(data);
 
 		flag = true;
 	}
@@ -508,6 +500,27 @@ bool SingleList::DeleteAll() {
 
 	bool flag = false;
 
+	if (head->getlink() != NULL) {
+
+		// 삭제 가능함으로 true로
+		flag = true;
+
+		// Node 객체의 재귀메서드를 통한 전노드 삭제 기능 구현
+		head->allNodeDelete();
+
+	}
+	else {
+		cout << "남아있는 학생정보 노드가 없습니다." << endl;
+	}
+
+	return flag;
+}
+
+//-----------------------------------------------------[구 전체학생 삭제]---------------------------------------------------------------
+bool SingleList::DeleteAll_old() {
+
+	bool flag = false;
+
 	// head가 가리키는 link의 주소값의 다른 노드의 주소값이 시작
 	Node* tmpForNext = head->getlink();
 	Node* tmpForDelete = NULL;
@@ -530,8 +543,10 @@ bool SingleList::DeleteAll() {
 	}
 
 	// 다 삭제했으면, head의 link 멤버를 null로..
-	head->init();
+	head->setlink(NULL);
 
 	return flag;
 
+
 }
+
