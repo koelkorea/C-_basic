@@ -25,59 +25,59 @@ using namespace std;
 class student {
 
 	// 멤버변수인 이름, 전번은 private로 외부에서 접근불가
-	private:
-		char* name;
-		char* phone;
+private:
+	char* name;
+	char* phone;
 
 	// 학생정보 class의 멤버변수를 조작하는 멤버함수는 public
-	public:
+public:
 
-		// 학생 class 생성자 with parameter -> 두 멤버변수 전부 NULL
-		student(char* _name, char* _phone) {
-			name = _name;
-			phone = _phone;
+	// 학생 class 생성자 with parameter -> 두 멤버변수 전부 NULL
+	student(char* _name, char* _phone) {
+		name = _name;
+		phone = _phone;
+	}
+
+	// 학생 class 생성자 no parameter -> 두 멤버변수 전부 NULL
+	student() {
+		name = NULL;
+		phone = NULL;
+	}
+
+	// 해당 학생 클래스의 char*로 동적할당 된 멤버변수 2개 전부 동적해제하는 소멸자
+	//  -> 멤버 2개 전부 NULL이면, 동작하게 않게 조치 (= 포인터에 기록된 주소값이 NULL인데 뭔 접근이 되겄음?)
+	~student() {
+
+		if (name != NULL) {
+			delete[] name;
 		}
 
-		// 학생 class 생성자 no parameter -> 두 멤버변수 전부 NULL
-		student() {
-			name = NULL;
-			phone = NULL;
+		if (phone != NULL) {
+			delete[] phone;
 		}
+	}
 
-		// 해당 학생 클래스의 char*로 동적할당 된 멤버변수 2개 전부 동적해제하는 소멸자
-		//  -> 멤버 2개 전부 NULL이면, 동작하게 않게 조치 (= 포인터에 기록된 주소값이 NULL인데 뭔 접근이 되겄음?)
-		~student() {
+	// char 포인터변수 name의 현 주소값 return함수
+	inline char* getName() {
+		return name;
+	}
 
-			if (name != NULL) {
-				delete[] name;
-			}
+	// char 포인터변수 phone의 현 주소값 return함수
+	inline char* getPhone() {
+		return phone;
+	}
 
-			if (phone != NULL) {
-				delete[] phone;
-			}
-		}
+	// char 포인터변수 name의 새 주소값을 parameter에 들어온 걸로 갱신해주는 boolean 함수
+	inline bool setName(char* _name) {
+		name = _name;
+		return true;
+	}
 
-		// char 포인터변수 name의 현 주소값 return함수
-		inline char* getName() {
-			return name;
-		}
-
-		// char 포인터변수 phone의 현 주소값 return함수
-		inline char* getPhone() {
-			return phone;
-		}
-
-		// char 포인터변수 name의 새 주소값을 parameter에 들어온 걸로 갱신해주는 boolean 함수
-		inline bool setName(char* _name) {
-			name = _name;
-			return true;
-		}
-
-		// char 포인터변수 phone의 새 주소값을 parameter에 들어온 걸로 갱신해주는 boolean 함수
-		inline bool setPhone(char* _phone) {
-			phone = _phone;
-			return true;
-		}
+	// char 포인터변수 phone의 새 주소값을 parameter에 들어온 걸로 갱신해주는 boolean 함수
+	inline bool setPhone(char* _phone) {
+		phone = _phone;
+		return true;
+	}
 };
 
 // linkedList의 단위가 되는 Node의 단위값으로 student클래스의 포인터변수를 채택
@@ -88,123 +88,124 @@ typedef student* NodeElement;
 class Node {
 
 	// 멤버변수인 노드요소(student 클래스 포인터변수), 다음 Node객체의 주소값을 담는 Node 클래스 포인터변수는 private로 외부에서 접근불가
-	private:
-		NodeElement value;
-		Node* link;
+private:
+	NodeElement value;
+	Node* link;
 
 	// 대상 Node class의 멤버변수를 조작하는 멤버함수는 public
-	public:
+public:
 
-		// Node 생성자 with parameter-> 두 멤버변수 전부 NULL
-		Node(NodeElement _value, Node* _link) {
-			value = _value;
-			link = _link;
-		}
+	// Node 생성자 with parameter-> 두 멤버변수 전부 NULL
+	Node(NodeElement _value, Node* _link) {
+		value = _value;
+		link = _link;
+	}
 
-		// Node 생성자 no parameter-> 두 멤버변수 전부 NULL
-		Node() {
-			value = NULL;
-			link = NULL;
-		}
+	// Node 생성자 no parameter-> 두 멤버변수 전부 NULL
+	Node() {
+		value = NULL;
+		link = NULL;
+	}
 
-		// 해당 Node 클래스의 Node*로 동적할당 된 멤버변수 2개 전부 동적해제하는 소멸자
-		//  -> 멤버 2개 전부 NULL이면, 동작하게 않게 조치 (= 포인터에 기록된 주소값이 NULL인데 뭔 접근이 되겄음?)
-		~Node() {
+	// 해당 Node 클래스의 Node*로 동적할당 된 멤버변수 2개 전부 동적해제하는 소멸자
+	//  -> 멤버 2개 전부 NULL이면, 동작하게 않게 조치 (= 포인터에 기록된 주소값이 NULL인데 뭔 접근이 되겄음?)
+	~Node() {
 
-			if (value != NULL) {
-				// delete 포인터 : 해당 포인터에 존재 및 연계된 포인터가 가르키는 동적할당된 객체를 제거한다 (소멸자에 잘못쓰면 연쇄 삭제 일어남..)
-				delete value;
-			}
-
-			link = NULL;
-		}
-
-		// ---------------------------------------(추가) 해당 멤버함수를 실행한 노드를 포함 이후 모든 노드 삭제기능 (일단 헤드만 가능하게..)------------------------------------------
-		void allNodeDelete() {
-
-			if (link != NULL) {
-				link->allNodeDelete();
-			}
-
-			if (this->getValue() != NULL) {
-				cout << " ->> 이름이 " << this->getValue()->getName() << "인 학생정보 Node 삭제 완료!!" << endl;
-			}else {
-				cout << " ->> 헤드Node 삭제 완료!!" << endl;
-			}
-
+		if (value != NULL) {
 			// delete 포인터 : 해당 포인터에 존재 및 연계된 포인터가 가르키는 동적할당된 객체를 제거한다 (소멸자에 잘못쓰면 연쇄 삭제 일어남..)
-			delete this;
-		}
-		// ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
-		// Node 클래스 포인터변수 value의 현 주소값 return함수
-		inline NodeElement getValue() {
-			return value;
+			delete value;
 		}
 
-		// Node 클래스 포인터변수 link의 현 주소값 return함수
-		inline Node* getlink() {
-			return link;
+		link = NULL;
+	}
+
+	// ---------------------------------------(추가) 해당 멤버함수를 실행한 노드를 포함 이후 모든 노드 삭제기능 (일단 헤드만 가능하게..)------------------------------------------
+	void allNodeDelete() {
+
+		if (link != NULL) {
+			link->allNodeDelete();
 		}
 
-		// Node 클래스 포인터변수 value의 새 주소값을 parameter에 들어온 걸로 갱신해주는 함수
-		inline void setValue(NodeElement data) {
-			value = data;
+		if (this->getValue() != NULL) {
+			cout << " ->> 이름이 " << this->getValue()->getName() << "인 학생정보 Node 삭제 완료!!" << endl;
+		}
+		else {
+			cout << " ->> 헤드Node 삭제 완료!!" << endl;
 		}
 
-		// Node 클래스 포인터변수 link의 새 주소값을 parameter에 들어온 걸로 갱신해주는 함수
-		inline void setlink(Node* _link) {
-			link = _link;
-		}
+		// delete 포인터 : 해당 포인터에 존재 및 연계된 포인터가 가르키는 동적할당된 객체를 제거한다 (소멸자에 잘못쓰면 연쇄 삭제 일어남..)
+		delete this;
+	}
+	// ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+	// Node 클래스 포인터변수 value의 현 주소값 return함수
+	inline NodeElement getValue() {
+		return value;
+	}
+
+	// Node 클래스 포인터변수 link의 현 주소값 return함수
+	inline Node* getlink() {
+		return link;
+	}
+
+	// Node 클래스 포인터변수 value의 새 주소값을 parameter에 들어온 걸로 갱신해주는 함수
+	inline void setValue(NodeElement data) {
+		value = data;
+	}
+
+	// Node 클래스 포인터변수 link의 새 주소값을 parameter에 들어온 걸로 갱신해주는 함수
+	inline void setlink(Node* _link) {
+		link = _link;
+	}
 };
 
 // linkedList의 시작점 주소를 점화해주는 헤드 Node의 위치값을 담는 class
 class SingleList {
 
-	private:
-		Node* head;
+private:
+	Node* head;
 
 	// 대상 Node class의 멤버변수를 조작하는 멤버함수는 public
-	public:
+public:
 
-		// SingleList 클래스 생성자 
-		//  : 해당 클래스를 생성 = 사실상 헤드노드를 생성하는 것
-		//    -> 헤드노드는 일단 무조건 존재해야 함(head노드의 위치는 NULL이면 안됨)
-		SingleList() {
-			head = new Node;
+	// SingleList 클래스 생성자 
+	//  : 해당 클래스를 생성 = 사실상 헤드노드를 생성하는 것
+	//    -> 헤드노드는 일단 무조건 존재해야 함(head노드의 위치는 NULL이면 안됨)
+	SingleList() {
+		head = new Node;
+	}
+
+	// 해당 Node 클래스의 Node*로 동적할당 된 멤버변수 2개 전부 동적해제하는 함수
+	//  -> 멤버인 head가 NULL이면, 동작하게 않게 조치 (= 포인터에 기록된 주소값이 NULL인데 뭔 접근이 되겄음?)
+	~SingleList() {
+
+		if (head != NULL) {
+
+			head->allNodeDelete();
+
+			//----------[소멸자에 allNodeDelete 적용전]------------
+			// delete head;
+			//-----------------------------------------------------
+
+			head = NULL;
 		}
+	}
 
-		// 해당 Node 클래스의 Node*로 동적할당 된 멤버변수 2개 전부 동적해제하는 함수
-		//  -> 멤버인 head가 NULL이면, 동작하게 않게 조치 (= 포인터에 기록된 주소값이 NULL인데 뭔 접근이 되겄음?)
-		~SingleList() {
+	// student 객체 포인터변수를 parameter로 받으면, linkedList에 그 student 객체의 정보에 해당하는 노드 추가후 성공하면 연결하여 true 뱉는 함수
+	bool InsertNode(NodeElement data);
 
-			if (head != NULL) {
+	// 출력된 리스트를 보고 순번인 int를 parameter로 받으면, linkedList에 그 순번의 student 객체의 정보에 해당하는 노드 삭제하여 true 뱉는 함수
+	bool DeleteNode(int deleteNodenum);
 
-				head->allNodeDelete();
+	// (추가) 출력된 리스트를 보고 순번인 int를 parameter로 받으면, 그 linkedList에 그 순번 이후의 student 객체의 정보에 해당하는 노드 전부를 삭제하여 true 뱉는 함수
+	bool DeleteNumAfter(int deleteNodenum);
 
-				//----------[소멸자에 allNodeDelete 적용전]------------
-				// delete head;
-				//-----------------------------------------------------
-				
-				head = NULL;
-			}
-		}
+	// linkedList의 head부터 출발해서, 마지막 노드의 student 객체의 정보를 출력해주고, 출력완료시 총 학생수를 뱉는 함수 
+	int PrintList();
 
-		// student 객체 포인터변수를 parameter로 받으면, linkedList에 그 student 객체의 정보에 해당하는 노드 추가후 성공하면 연결하여 true 뱉는 함수
-		bool InsertNode(NodeElement data);
-
-		// 출력된 리스트를 보고 순번인 int를 parameter로 받으면, linkedList에 그 순번의 student 객체의 정보에 해당하는 노드 삭제하여 true 뱉는 함수
-		bool DeleteNode(int deleteNodenum);
-
-		// (추가) 출력된 리스트를 보고 순번인 int를 parameter로 받으면, 그 linkedList에 그 순번 이후의 student 객체의 정보에 해당하는 노드 전부를 삭제하여 true 뱉는 함수
-		bool DeleteNumAfter(int deleteNodenum);
-
-		// linkedList의 head부터 출발해서, 마지막 노드의 student 객체의 정보를 출력해주고, 출력완료시 총 학생수를 뱉는 함수 
-		int PrintList();
-
-		// linkedList의 모든 Node 정보 및 student객체 삭제하기
-		bool DeleteAll();
-		bool DeleteAll_old();
+	// linkedList의 모든 Node 정보 및 student객체 삭제하기
+	bool DeleteAll();
+	bool DeleteAll_old();
 
 };
 
@@ -257,10 +258,6 @@ void PrintMenu(int& menu, SingleList*& head) {
 			cin >> inputName >> inputPhoneNumber;
 
 			//------------------------------[student class객체 생성 + 입력한 이름, 전번 객체의 멤버변수로 옮기기]---------------------------
-
-			// 이름의 문자열 길이만큼 char의 동적배열을 메모리에 할당하고, 그 시작주소값을 동적할당된 student 인스턴스 위치의 setName()의 patameter로 대입 후 역참조 실행
-			//  -> 해당 student 인스턴스의 멤버변수인 char 포인터인 name의 값을 그 동적할당 char동적배열 시작주소값으로 대입
-
 
 			// 'name', 'phoneNumber' 만큼의 char 크기만큼의 동적배열을 메모리에 할당하여 생성 후,  
 			//  -> 그들의 char 포인터값을 생성자 함수의 parameter로 대입하여 student 객체 인스턴스의 멤버변수 값으로 대입하여 객체 생성
@@ -389,11 +386,13 @@ void PrintMenu(int& menu, SingleList*& head) {
 					cout << "\t>>>> (알림) 학생 정보 전체 삭제실패!" << endl << endl;
 				}
 
-			}else {
+			}
+			else {
 				cout << "\t>>>> (알림) 학생 정보 전체 삭제명령을 취소하셨습니다." << endl << endl;
 			}
-			
-		}else {
+
+		}
+		else {
 			cout << "\t>>>> (알림) 학생 정보가 없어서 삭제를 할 수 없습니다!" << endl << endl;
 		}
 
