@@ -1,73 +1,136 @@
 // string 클래스
-//  : 그 동안 char[] 형식으로 접근하느라 ㅈㄹ맞게 까다로웠던, 문자열을 본격적으로 객체로 사용하기 위해 제작된 namespace std안의 class 타입
+//  : 그 동안 char[] 형식으로 접근하느라 ㅈㄹ맞게 까다로웠던, 문자열을 본격적으로 객체로 사용하기 위해 제작된 namespace std 안의 class 타입
+//     -> 단! char 배열을 사용하는 근본 자체는 변하지는 않는게, 멤버변수인 allocator class객체가 기존 char*를 사용한 동적배열 방식의 메모리 동적할당 및 해제를 해주기 때문
 
 
-//C style
-//char str[15] = "Hello World!(\0)"
-//(큰 따옴표 : "문자열 상수(\0)", 작은 따옴표 : '문자 상수 값')
-
-//C++ style
-//string str1("Hello World!"), str2 = "Hello World!";
-
-//#include <string>
-//namespace std {
-//    class string {
-//        unsigned __int64 size;         <- 저장된 문자열의 개수 = 2^64개의 문자열
-//        unsigned __int64 capacity;     <- 저장 가능한 총 용량 = 2^64개의 문자열
-//        allocator<char> allocator;     <- 배열에 대한 메모리 할당 및 해제를 관리
-//    };
-//}
-
-//Constructor(생성자)
-
-//Constructor(생성자)	의미
-//객체명()	크기가 0인 default 생성자
-//객체명(const char* s)	"문자열 상수(\0)"
-//객체명(const string & str)	string 객체의 복사 생성자
-//객체명(size_type n, char c)	문자 C를 n개 구성한 문자열
-//객체명(const char* s, size n)	문자열 상수에서 n개까지 초기화
-//s의 문자열 길이 < n 가능
-//    template<class Iter>
-//객체명(Iter begin, Iter end)	begin ≤ 문자열 < end 초기화
-//    Iterater : 반복자, 포인터
-//    객체명(const string& str, size pos, size n = npos)	str[pos] ≤ 문자열 < str[n]
-
-
-//String(문자열) 입력
-
-//C style
-// : char 자료형 배열 사용한 문자열 입력(= 기본적으로는 정적할당)
-//char name[15];
-//cin >> name; // 공백문자 전까지 14(+'\0')개 저장 가능. [ 큐에 '\n' 남김 ]
-//while (cin.get() != '\n');
-//cin.get(name, 15); // 1행 입력 받기 [ 큐에 '\n' 남김 ]
-//cin.getline(name, 15); // 1행 입력 받기 [ '\n'(Enter) 버림 ]
-//cin.getline(name, 15, ':'); // 1행 입력 받기 [ ':' 버림 ]
-
-//C++ style
-// : string class를 통한 문자열 입력 (= 동적할당)
+//   #  C언어와 C++에서 문자열을 저장하는 자료형
 // 
-//입력 받은 문자열 자동 크기 조절
-//string fullname;
-//cin >> fullname; // 공백문자 전까지 저장 가능. [ 큐에 '\n' 남김 ]
-//while (cin.get() != '\n');
-//getline(cin, fullname); // 1행 입력 받기 [ '\n'(Enter) 버림 ]
-//getline(cin, fullname, ':'); // 1행 입력 받기 [ ':' 버림 ]
+//      - C언어 char 사용
+//         : char 변수명[숫자] = "문자열 상수(\0)"  or '문자 상수 값'
+// 
+//           ex) char str1[15] = "Hello World!(\0)"      <- 거의 null문자가 세트로 붙음
+//               char str2[15] = 'Hello World!'
 
-//제한 요소 : unsigned __int64(2 ^ 64)저장 가능한 문자열 개수, 메모리 크기
+//      - C++는 string 사용
+//         : string 변수명("문자열 상수")  or  string 변수명 = "문자열 상수";
+// 
+//           ex) string str1("Hello World!");         <- 파라미터로 입력하는 법
+//               str2 = "Hello World!";               <- 직접 문자열 값 대입하는 법
 
 
-// String(문자열)의 Method(멤버 함수) = 객체.Method();
+//   #  C++의 string 클래스의 멤버구조 해체
+//      : 간단히 말해, C++에서 개별 string객체는 자신이 위치한 문자열 포인터값과 거기 저장된 문자열의 갯수 및 크기가 얼만지에 대한 정보를 제공함
+//        (= 그러니까 string 객체가 직접 문자열 값을 저장하는게 아니라, 객체가 가진 데이터는 문자열을 추출하기 위한 일종의 metadata라 생각하면 편함) 
+// 
+//      -----------------------------------------------------------------------------------------------------
+//      #include <string>
+        
+//      namespace std {                        <- (중요!) 그 입/출력 관련 비트연산자를 사용하는 cin, cout 객체와 같은 namespace에 위치
+//       
+//          class string {
+//              unsigned __int64 size;         <- 멤버변수1 : size      (= 저장 가능 문자열의 개수 -> 2^64개)
+//              unsigned __int64 capacity;     <- 멤버변수2 : capacity  (= 저장 가능 총 용량 크기 -> 2^64 byte)
+//              allocator<char> allocator;     <- 멤버변수2 : allocator (= 문자열 배열에 대한 메모리 할당 및 해제를 관리하는 class객체)
+//          };
+//      }
+//      ---------------------------------------------------------------------------------------------------------
 
-//  - 문자열의 특정 위치의 문자 반환
-//    1. char& at(size_t n)
-//        : 문자열 n칸 반환 (0 ≤ 문자열 < End)
-//    2. char& operator[] (size_t n)
-//        : 문자열 n칸 반환(0 ≤ 문자열 < End)
-//    3. char& front()
-//        : 문자열[0]칸에 해당하는 부분의 문자 반환
-//    4. char& back()
-//        : 문자열[End]칸에 해당하는 부분의 문자 반환
+//   #  string 클래스의 Constructor(생성자)의 종류
+//       -> 문자열 저장은 깊은 복사 전제
+
+//      1. string 객체명();
+//          :  default 생성자로 빈문자열이 저장
+// 
+//      2. string 객체명(const char* 포인터변수명);
+//          : 해당 char 포인터 위치에 존재하는 "문자열 상수(\0)" 를 입력
+// 
+//      3. string 객체명(const char* 포인터변수명, 숫자n or size크기자료형 변수명)	;
+//          : 해당 char 포인터 위치의 문자열의 시작 ~ n개까지 초기화
+//            -> (중요) char 포인터 위치의 문자열 길이가 초기화할 크기 n보다 작아도 됨)
+// 
+//      4. string 객체명(const string & 레퍼런스변수명);
+//          : string 클래스의 복사 생성자
+//            ->  이미 존재하는 string 객체의 문자열 내용을 깊은 복사하여 대입
+// 
+//      5. string 객체명(const string & 레퍼런스변수명, index자료형 begin, index자료형 end = npos)	
+//          : string 클래스의 복사 생성자 확장판
+//            -> 이미 존재하는 string 객체의 문자열 내용중 index가 begin ~ end까지에 해당하는 문자들만 따로 추출하여, 깊은 복사하여 대입
+//                ex) string ex(str, 3, 4) == str[3] ~ str[4] = ex의 문자열
+// 
+//      6. string 객체명(숫자n or size크기자료형 변수명, char 변수명);
+//          : 문자 C를 n개로 구성한 문자열을 대입하여 초기화한 string 객체 생성
+// 
+//      7. string 객체명(const char* 시작포인터변수명, const char* 도착포인터변수명)	
+//          : 시작포인터변수명에 기록된 char 포인터 위치를 시작으로 도착포인터변수명에 기록된 char 포인터 위치를 끝으로 한 문자열 내용을 깊은 복사하여 저장하는 string 객체 생성
+//             ex) string ex(str + 3, str + 34) == str[3] ~ str[34] = ex의 문자열
+// 
+//      8. string 객체명(Iter begin, Iter end)	
+//          : Iterator begin에 기록된 char 포인터 위치를 시작으로 Iterator end 기록된 char 포인터 위치를 끝으로 한 문자열 내용을 깊은 복사하여 저장하는 string 객체 생성
+//             ex) string ex(str + 3, str + 34) == str[3] ~ str[34] = ex의 문자열
+//             -> Iterater : 포인터처럼 기능하는 반복자 class변수로 이해하면 됨
+
+//   # string::npos의 의미
+//      :  find() 함수 수행 시에 찾는 문자열이 없을 때 반환되는 상수 -1을 의미
+
+
+
+//   # C언어와 C++에서 문자열을 입력하는 방법차이
+// 
+//      - C언어 : char 배열 사용한 문자열 입력 (= 기본적으로는 정적할당)
+// 
+//         1. cin과 비트연산자 사용한 입력 
+//         
+//            ex) char name[15];                      <-  최대 14(+'\0')개 저장 가능 (입력 stream 버퍼에는 '\n' 남아있음)
+//                cin >> name; 
+//                while (cin.get() != '\n');
+// 
+//         2. cin.get(char포인터변수명, 배열크기n) 
+//             : char배열명에 해당하는 시작위치에 위치한 n크기 만큼의 배열에 문자열을 입력하면 '\n'까지를 기준으로 1행으로 입력받음 
+//                -> (중요!) 단, 그러고 난뒤 입력 stream 버퍼에는 '\n' 남아있음
+// 
+//               ex) cin.get(name, 15);               <-  최대 14(+'\0')개 저장 가능 (입력 stream 버퍼에는 '\n' 남아있음)
+// 
+//         3. cin.getline(char포인터변수명, 배열크기n, '구분자' = '\n') 
+//             : char배열명에 해당하는 시작위치에 위치한 n크기 만큼의 배열에 문자열을 입력하면, 구분자(기본 parameter = '\n')에 해당하는 문자까지만 1행으로 입력받음
+//                -> getline 특성
+//                    a. 입력 stream 버퍼에 남은 '\n'이나 '구분자'도 같이 없어짐  
+//                          <-> 단! 구분자를 입력하면, 그 녀석과 이후 나머지 문자열은 입력버퍼에 남게 됨
+//                    b. 구분자의 기본 parameter = '\n'
+// 
+//               ex) cin.getline(name, 15);           <-  최대 14(+'\0')개 저장 가능 (입력 stream 버퍼에 남은 '\n' 버림)
+//                   cin.getline(name, 15, ':');      <-  최대 14(+'\0')개 저장 가능 (입력 stream 버퍼에 남은 ':' 버리지만, 그 이후 문자들이 남아있음)
+// 
+// 
+//      - C++ :  string class를 통한 문자열 입력 (= 동적할당이 기본)
+// 
+//         1. cin과 비트연산자 사용한 입력 
+//         
+//            ex) string fullname;
+//                cin >> fullname;                    <- 동적할당 된 문자열객체라 크기는 2^64자 까지.. 빈공간도 입력되며, '\n'까지를 기준으로 1행으로 입력받음 (입력 stream 버퍼에는 '\n' 남아있음)
+//                while (cin.get() != '\n');
+// 
+//         2. getline(cin, string객체명, '구분자' = '\n') 
+//             : string객체명에 cin 객체를 사용하여 문자열을 입력하면, 구분자(기본 parameter = '\n')에 해당하는 문자까지만 입력받음
+//                -> getline 특성
+//                    a. 입력 stream 버퍼에 남은 '\n'은 같이 없어짐  
+//                          <-> 단! 구분자를 입력하면, 그 녀석과 이후 나머지 문자열은 입력버퍼에 남게 됨
+//                    b. 구분자의 기본 parameter = '\n'
+// 
+//               ex) getline(cin, fullname);           <-  동동적할당 된 문자열객체라 크기는 2^64자 까지.. 빈공간도 입력되며, '\n'까지를 기준으로 1행으로 입력받음 (입력 stream 버퍼에 남은 '\n' 버림)
+//                   getline(cin, fullname, ':');      <-  동동적할당 된 문자열객체라 크기는 2^64자 까지.. 빈공간도 입력되며, ':'까지를 기준으로 1행으로 입력받음 (입력 stream 버퍼에 남은 ':' 버리지만, 그 이후 문자들이 남아있음)
+
+
+//   # String(문자열)의 Method(멤버 함수) = 객체.Method();
+
+//     - 문자열의 특정 위치의 문자 반환
+//       1. char& at(size_t n)
+//           : 문자열 n칸 반환 (0 ≤ 문자열 < End)
+//       2. char& operator[] (size_t n)
+//           : 문자열 n칸 반환(0 ≤ 문자열 < End)
+//       3. char& front()
+//           : 문자열[0]칸에 해당하는 부분의 문자 반환
+//       4. char& back()
+//           : 문자열[End]칸에 해당하는 부분의 문자 반환
 
 //문자열 길이 관련 반환
 //size_t size() const == size_t length() const : 문자열 길이 반환
@@ -121,65 +184,3 @@
 //String[n]
 //char& operator[] (const size_t n) :
 //const char& operator[] (const size_t n) const :
-
-
-
-
-#include <iostream>
-#include <string>
-using namespace std;
-
-
-int main() {// 생성자 
-
-    char ary[] = "The sun will shine on us again.";
-
-    // 1. string()
-    //  -> str1 == str1() == ''
-    string str1;
-
-    // 2. string(const char * const s)
-    //  -> str2(ary) == 'hi!'
-    string str2("hi!");
-
-    // 3. string(char * s)
-    //  -> str_2(ary) == 'The sun will shine on us again.'
-    string str_2(ary);
-
-    // 4. string(const string &str)
-    //  -> str3(str2) == 'hi!'
-    string str3(str2);
-
-    // 6. string(size_type n, char c);
-    //  -> str4(5, 'k') == 'kkkkk'
-    string str4(5, 'k');
-
-    // 7. string(const char* s, size_type n)
-    //  ->  str5("Korea", 10) == 'Korea'
-    string str5("Korea", 10);
-
-    // 8. string(Iter begin, Iter end),(char* begin, char* end)
-    //  -> str6(ary + 4, ary + 24) == 'sun will shine on us'
-    string str6(ary + 4, ary + 24);
-
-    // 9. string(const string& str, size pos, size n=npos)
-    //  -> str7(str_2, 4, 14) == 'sun will shine'
-    string str7(str_2, 4, 14);
-
-    // 10. string(const char * str, size pos, size n=npos)
-    //  -> str_7("new world string", 4, 5) == 'world'
-    string str_7("new world string", 4, 5);
-
-    cout << "=======================================" << endl;
-    cout << "str 01  " << str1 << endl;
-    cout << "str 02  " << str2 << endl;
-    cout << "str 002 " << str_2 << endl;
-    cout << "str 03  " << str3 << endl;
-    cout << "str 04  " << str4 << endl;
-    cout << "str 05  " << str5 << endl;
-    cout << "str 06  " << str6 << endl;
-    cout << "str 07  " << str7 << endl;
-    cout << "str 007 " << str_7 << endl;
-    cout << "=======================================" << endl;
-    return 0;
-}
