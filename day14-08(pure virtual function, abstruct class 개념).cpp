@@ -146,34 +146,24 @@ int main() {
 
 		switch (flag) {
 
-		case 1:
-		{
-			any = new Dog();
-			break;
-		}
-		case 2:
-		{
-			any = new Cat();
-			break;
-		}
-		case 3:
-		{
-			any = new Pig();
-			break;
-		}
-		case 4:
-		{
-			any = new Duck();
-			break;
-		}
-		case 5:
-		{
-			any = new Human();
-			break;
-		}
-		default:
-			exit(0);
-			break;
+			case 1:
+				any = new Dog();
+				break;
+			case 2:
+				any = new Cat();
+				break;
+			case 3:
+				any = new Pig();
+				break;
+			case 4:
+				any = new Duck();
+				break;
+			case 5:
+				any = new Human();
+				break;
+			default:
+				exit(0);
+				break;
 		}
 
 		any->speak();

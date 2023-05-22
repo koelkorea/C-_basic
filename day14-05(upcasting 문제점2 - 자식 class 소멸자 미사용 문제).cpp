@@ -32,38 +32,61 @@
 // 컨트롤 클래스를 통한 Up casting 문제점2 예시
 //  -> delete시 부모 class 소멸자로 작동하는 바람에, 하위class의 소멸자는 호출되지 않는 컨트롤 클래스인 부모 class포인터..
 #include <iostream>
-#pragma warning (disable : 4996)
+
 using namespace std;
 
 class Person {
-private:
-    char* name;
-public:
-    Person(const char* pN) { name = new char[strlen(pN) + 1]; strcpy(name, pN); cout << "\nPerson 생성"; }
-    ~Person() { cout << "\nPerson 소멸\n"; delete[] name; }
-    virtual void show() { cout << "\n\n이름 : " << name; }
+
+    private:
+        char* name;
+
+    public:
+        Person(const char* pN) {
+            name = new char[strlen(pN) + 1];
+            strcpy_s(name, strlen(pN) + 1, pN);
+            cout << "\nPerson 생성";
+        }
+
+        ~Person() {
+            cout << "\nPerson 소멸\n";
+            delete[] name;
+        }
+
+        virtual void show() {
+            cout << "\n\n이름 : " << name << endl;
+        }
 };
 
 class Custom : public Person {
-private:
-    char* phone;
-    char* nationality;
-public:
-    Custom(const char* pN, const char* pP, const char* pNa) : Person(pN) {
-        phone = new char[strlen(pP) + 1];
-        strcpy(phone, pP);
-        nationality = new char[strlen(pNa) + 1];
-        strcpy(nationality, pNa);
-        cout << "\nCustom 생성";
-    }
-    ~Custom() { cout << "\nCustom 소멸"; delete[] phone, nationality; }
-    virtual void show() { Person::show(); cout << "\n번호 : " << phone << "\n주소 : " << nationality << endl; }
+
+    private:
+        char* phone;
+        char* nationality;
+
+    public:
+
+        Custom(const char* pN, const char* pP, const char* pNa) : Person(pN) {
+            phone = new char[strlen(pP) + 1];
+            strcpy_s(phone, strlen(pP) + 1, pP);
+            nationality = new char[strlen(pNa) + 1];
+            strcpy_s(nationality, strlen(pNa) + 1, pNa);
+            cout << "\nCustom 생성";
+        }
+
+        ~Custom() {
+            cout << "\nCustom 소멸";
+            delete[] phone, nationality;
+        }
+
+        virtual void show() {
+            Person::show();
+            cout << "\n번호 : " << phone << "\n주소 : " << nationality << endl;
+        }
 };
 
 int main() {
 
     Person* c1 = new Custom("michelin", "010-1234-5678", "South Korea");
-
     c1->show();
 
     // 부모 class포인터를 통한 생성자이기에..

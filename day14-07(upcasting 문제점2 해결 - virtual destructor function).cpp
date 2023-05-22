@@ -8,9 +8,9 @@
 //        : virtual ~클래스명() {  내용  };
 //           -> 최상위 class 소멸자에만 virtual을 추가로 선언해도, 하위 class 까지 모두 가상 소멸자 적용되게 설계함
 
+
 // day 14-05 예시코드를 가상 소멸자 함수 적용하여 수정한 예시
 #include <iostream>
-#pragma warning (disable : 4996)
 
 using namespace std;
 
@@ -26,7 +26,7 @@ class Person {
         //  : 이름을 char배열인 문자열로 parameter로 넣으면 char배열로 받고, 이를 char배열로 동적할당한 char포인터인 멤버변수 name의 위치에 해당하는 곳에 복사함
         Person(const char* pN) {
             name = new char[strlen(pN) + 1]; 
-            strcpy(name, pN); 
+            strcpy_s(name, strlen(pN) + 1, pN);
 
             cout << "\nPerson 생성"; 
         }
@@ -63,10 +63,10 @@ class Custom : public Person {
         Custom(const char* pN, const char* pP, const char* pNa) : Person(pN) {
 
             phone = new char[strlen(pP) + 1];
-            strcpy(phone, pP);
+            strcpy_s(phone, strlen(pP) + 1, pP);
 
             nationality = new char[strlen(pNa) + 1];
-            strcpy(nationality, pNa);
+            strcpy_s(nationality, strlen(pNa) + 1, pNa);
 
             cout << "\nCustom 생성";
         }
@@ -88,6 +88,7 @@ int main() {
     Person* c1 = new Custom("michelin", "010-1234-5678", "South Korea");
     c1->show();
 
+    // 가상 소멸자 함수를 통해 자식 객체 내용까지 전체 동적할당 해제 완료
     delete c1;
 
     return 0;

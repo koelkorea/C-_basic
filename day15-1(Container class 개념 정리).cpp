@@ -31,7 +31,7 @@
 //           : 선입선출(FIFO), 후입선출(LIFO)이 모두 가능한 데이터 구조를 가지는 class
 
 
-//   # 컨테이너 클래스(Container Class) 관련 용어
+//   # (중요!) 컨테이너 클래스(Container Class) 관련 용어
 //      1. 템플릿(Template) = JAVA의 제너릭스(generics)
 //          : <자료형> 을 의미하는 기호로 일종의 list나 vector와 같은 가변형 동적배열이나, list계열의 linkedList를 특정 class의 객체배열로 사용하기 위해 입력 자료형을 지정하는 역할을 함 
 //             -> 쉽게 말해, C언어에서 컨테이너 class 구현할때, node나 list 내부의 value값의 타입을 'typedef value자료형 컨테이너명_element;' 식으로 구현한걸 정식으로 기능화
@@ -62,27 +62,26 @@
 //          : 어떤 컨테이너 class 객체를 생성하되, 특정 컨테이너 class 객체의 할당자(Allocator)를 복사하여 초기화하는 역할을 수행하는 생성자
 
 //      4. 이터레이터(Iterator) class
-//          : 컨테이너 class 객체 내의 각 요소에 접근하고 순회하기 위한 범용성 높은 '인터페이스를 제공하는 class'
-//            (= 쉽게 말해, 컨테이너 class 계보에 속해 있다면, 공통의 표준화된 class 구조를 사용하여 내부 요소 참조 및 순회를 가능하게 한다는 것)
+//          : 컨테이너 class 객체 내의 각 요소에 접근하고 순회하기 위한 범용성 높은 [C++에서는 포인터와 비슷한 구조] '인터페이스를 제공하는 class'
+//            (= 쉽게 말해, 컨테이너 class 계보에 속해 있다면, 공통의 표준화된 class 구조를 사용하여 [C++에서는 유사 포인터를 통한] 내부 요소 참조 및 순회를 가능하게 한다는 것)
 
-//           - 이터레이터의 이점
-//               : 각 자료구조 별로 제각각인 내부 요소 참조 및 접근을 위한 메서드를 쓰지 않아도 됨 
+//           - 이터레이터의 이점 : 각 자료구조 별로 제각각인 내부 요소 참조 및 접근을 위한 메서드를 쓰지 않아도 됨 
 
-//                  1. 컨테이너 class의 캡슐화 구현 달성
-//                      : 컨테이너 class의 내부 구조에 대한 정보 없어도, 쉽게 이터레이터의 인터페이스를 써서 컨테이너의 원소를 순회하고 조작가능
+//              1. 컨테이너 class의 캡슐화 구현 달성
+//                  : 컨테이너 class의 내부 구조에 대한 정보 없어도, 쉽게 이터레이터의 인터페이스를 써서 컨테이너의 원소를 순회하고 조작가능
 
-//                  2. 코드의 범용성과 유지보수성 증가
-//                      : 컨테이너 별로 따로 메서드를 쓰지 않아도, 이터레이터의 인터페이스로 조작이 가능하니, 애지간해서는 동작이 보장됨
+//              2. 코드의 범용성과 유지보수성 증가
+//                  : 컨테이너 별로 따로 메서드를 쓰지 않아도, 이터레이터의 인터페이스로 조작이 가능하니, 애지간해서는 동작이 보장됨
 // 
 //           - 이터레이터의 기능 예시
 //              1. next()
-//                  : 컨테이너 class 객체의 다음 데이터로 이동하고, 현재 원소를 반환
+//                  : 컨테이너 class 객체의 다음 iterator 위치의 데이터로 이동하고, 현재 원소를 반환
 
 //              2. remove()
-//                  : 컨테이너 class 객체의 현재 위치의 요소를 제거
+//                  : 컨테이너 class 객체의 현재 iterator 위치의 요소를 제거
 
 //              3. get()
-//                  : 컨테이너 class 객체의 현재 위치의 요소를 반환
+//                  : 컨테이너 class 객체의 현재 iterator 위치의 요소를 반환
 
 
 //   # 템플릿(Template) vs 제너릭스(generics)
@@ -95,14 +94,14 @@
 
 //  - List 
 //    : C++에서 이중 연결 리스트(doubly linked list)를 공식적으로 구현한 class
-      
+
 //     # List 객체 생성 형식
 //       : list<자료형> list객체명 = new list();   <- list 생성자를 통해 힙영역에 list 객체 동적할당
-      
+
 //     # List 메서드 호출 형식
 //       : list객체명.메서드명(parameters....);
-	  
-      
+
+
 //     # list Constructor(생성자)
 //       1. list()
 //           : list의 기본 생성자(default constructor) = 노드 없는 상태
@@ -137,8 +136,8 @@
 //    
 //       11. list(Iterator First, Iterator Last, Allocator& Al)
 //           : (9번의 template 선언 선행) 이터레이터를 통한 인터페이스 조작을 위한 First ~ Last를 begin ~ end로 삼는 노드가 생성하고, 할당자까지 복사하는 list 생성자.. 
-      
-      
+
+
 //     # list class method(멤버함수)
 //       1. (const) value자료형& front() (const);										
 //           : 1번째 linked list 요소값 참조 반환 (value값 자료형이 포인터면, 역참조 불가, 상수화)
@@ -184,25 +183,25 @@
 //    
 //       15. void assign(InputIterator First, InputIterator Last);
 //           : 해당 list 객체에, 어떤 컨테이너 class 객체의 First ~ Last까지의 값을 할당함 
-      
+
 //       16. bool empty() const;
 //           : linked list가 비어 있는지 여부 bool로 반환
-      
+
 //       17. void swap(list<Type, Allocator>& 대상 list객체명);
 //           : 2개의 linked list 간 요소를 교환
-      
+
 //       18. size_type size() const;
 //           : linked list의 요소의 총 개수를 반환
-      
+
 //       19. get_allocator() const;
 //           : 해당 컨테이너 class 객체(= list)의 할당자 복사본 반환
-      
+
 //       20. void reverse();
 //           : linked list 요소를 역순으로 순서를 변경해 둠
-      
+
 //       21. void sort();
 //           : 목록의 요소를 정렬하여 순서를 변경해 둠 (오름차순)
-      
+
 //       22. void merge(list<Type, Allocator>& 대상 list객체명);
 //           : 리스트 합병 정렬 (오름차순)
 
