@@ -7,10 +7,10 @@
 //  상속구조
 //   -> 고객 <- 메뉴 <- 커피, 스무디, 에이드 등
 
-// 풀이5 - class 멤버변수로 vector 컨테이너 클래스 객체 그 자체로 풀이
+// 풀이6 - class 멤버변수로 list 컨테이너 클래스 객체 그 자체, iterator를 사용한 통제로 풀이
 #include <string>
 #include <iostream>
-#include <vector>
+#include <list>
 
 using namespace std;
 
@@ -26,7 +26,7 @@ private:
 	string cellphone;
 
 	int orderNum;
-	vector<menu*> orderlist;
+	list<menu*> orderlist;
 
 public:
 	Customer(string _name, string _cellphone) {
@@ -51,13 +51,13 @@ public:
 		return orderNum;
 	}
 
-	// vector에 메뉴 추가 메서드 void ver
+	// list에 메뉴 추가 메서드 void ver
 	void addmenu(menu* choice) {
 		orderlist.push_back(choice);
 	}
 
-	// (중요) vector를 레퍼런스로 리턴하면 그 변수 그대로 call by reference 보내지만!, 그냥 vector 타입으로 넘기면... call by value 형식으로 가버림
-	vector<menu*>& getOrderlist() {
+	// (중요) list를 레퍼런스로 리턴하면 그 변수 그대로 call by reference 보내지만!, 그냥 list 타입으로 넘기면... call by value 형식으로 가버림
+	list<menu*>& getOrderlist() {
 		return orderlist;
 	}
 
@@ -71,47 +71,47 @@ int Customer::nextOrderNum = 0;
 // 모든 메뉴의 원형
 class menu {
 
-private:
-	string menuName;
-	int price;
+	private:
+		string menuName;
+		int price;
 
-public:
-	menu() {
-		menuName = "NULL";
-		price = 0;
-	}
+	public:
+		menu() {
+			menuName = "NULL";
+			price = 0;
+		}
 
-	menu(string _menuName, int _price) {
-		menuName = _menuName;
-		price = _price;
-	}
+		menu(string _menuName, int _price) {
+			menuName = _menuName;
+			price = _price;
+		}
 
-	//virtual ~menu();
+		//virtual ~menu();
 
-	string getMenuName() {
-		return menuName;
-	}
+		string getMenuName() {
+			return menuName;
+		}
 
-	int getprice() {
-		return price;
-	}
+		int getprice() {
+			return price;
+		}
 
-	void setMenuName(string _menuName) {
-		menuName = _menuName;
-	}
+		void setMenuName(string _menuName) {
+			menuName = _menuName;
+		}
 
-	void setprice(int _price) {
-		price = _price;
-	}
+		void setprice(int _price) {
+			price = _price;
+		}
 
-	// 메뉴에 해당되는 녀석을 고객의 menulist 동적객체배열에 추가
-	virtual void pickMenu(Customer* customer) {		}
+		// 메뉴에 해당되는 녀석을 고객의 menulist 동적객체배열에 추가
+		virtual void pickMenu(Customer* customer) {		}
 
-	// 메뉴정보 보여주기
-	virtual void show() {
-		cout << "메뉴 : " << menuName << endl;
-		cout << "가격 : " << price << endl;
-	}
+		// 메뉴정보 보여주기
+		virtual void show() {
+			cout << "메뉴 : " << menuName << endl;
+			cout << "가격 : " << price << endl;
+		}
 };
 
 void Customer::showAllMenu() {
@@ -120,10 +120,11 @@ void Customer::showAllMenu() {
 		cout << " ->> (경고!) 주문리스트에 올라온게 없습니다! 메뉴를 추가해주세요!" << endl;
 	}
 
-	for (int i = 0; i < orderlist.size(); i++) {
+	list<menu*>::iterator likePointer = orderlist.begin();
 
-		// (*(orderlist + i))->show();
-		orderlist[i]->show();
+	for (; likePointer != orderlist.end(); likePointer++) {
+
+		(*likePointer)->show();
 		cout << endl;
 	}
 
@@ -133,9 +134,11 @@ int Customer::howMuch() {
 
 	int result = 0;
 
-	for (int i = 0; i < orderlist.size(); i++) {
-		// result += (*(orderlist + i))->getprice();
-		result += orderlist[i]->getprice();
+	list<menu*>::iterator likePointer = orderlist.begin();
+
+	for (; likePointer != orderlist.end(); likePointer++) {
+
+		result += (*likePointer)->getprice();
 	}
 
 	return result;
@@ -162,7 +165,6 @@ public:
 
 	// 메뉴에 해당되는 녀석을 고객의 menulist 동적객체배열에 추가
 	virtual void pickMenu(Customer* customer) {
-		//customer->addmenu(this);
 		customer->getOrderlist().push_back(this);
 		cout << " ->> " << getMenuName() << "이(가) 메뉴에 추가되었습니다." << endl << endl;
 	}
