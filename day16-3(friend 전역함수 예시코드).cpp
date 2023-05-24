@@ -14,35 +14,37 @@
 using namespace std;
 
 // 전역함수 OutToday 함수에서 Date클래스를 parameter로 사용하기 때문에 Date클래스 미리 선언 (안 하면, 미 선언된 함수로 간주해서 error 뿜뿜)
-class Date; 
+class Date;
 
 class Time {
 
-	private:
-		int hour, min, sec;
+private:
+	int hour, min, sec;
 
-		// 전역함수인 outToday()는 호출 시 Time class의 private영역도 마음대로 가져다가 사용 가능
-		friend void outToday(Date& d, Time& t);
+	// 전역함수인 outToday()는 호출 시 Time class의 private영역도 마음대로 가져다가 사용 가능
+	//   -> friend 함수는 Time 본 class의 함수가 아니니.. 당연히 정의부까지 적어주면 안 됨!
+	friend void outToday(Date& d, Time& t);
 
-	public:
-		Time(int hour = 0, int min = 0, int sec = 0) : hour(hour), min(min), sec(sec) {}
+public:
+	Time(int hour = 0, int min = 0, int sec = 0) : hour(hour), min(min), sec(sec) {}
 
 };
 
 class Date {
-	private:
-		int year, month, day;
+private:
+	int year, month, day;
 
-		// 전역함수인 outToday()는 호출 시 Date class의 private영역도 마음대로 가져다가 사용 가능
-		friend void outToday(Date& d, Time& t); 
+	// 전역함수인 outToday()는 호출 시 Date class의 private영역도 마음대로 가져다가 사용 가능
+	//   -> friend 함수는 Date 본 class의 함수가 아니니.. 당연히 정의부까지 적어주면 안 됨!
+	friend void outToday(Date& d, Time& t);
 
-	public:
-		Date(int year, int month, int day) : year(year), month(month), day(day) {}
+public:
+	Date(int year, int month, int day) : year(year), month(month), day(day) {}
 };
 
 // 전역함수 outToday()는 Data, Time의 friend
 //  -> (중요!) 따라서 호출시 Time class private : int hour, min, sec; & Date class private: int year, month, day; 접근 가능
-void outToday(Date& d, Time& t){ 
+void outToday(Date& d, Time& t) {
 	cout << "오늘은 " << d.year << "/" << d.month << "/" << d.day << ", " << t.hour << ":" << t.min << ":" << t.sec << endl;
 }
 
@@ -52,6 +54,6 @@ int main() {
 	Time t(10, 30, 28);   // Time 객체 생성
 
 	// 전역함수 outToday()를 parameter인 Date 객체와, Time 객체와 함께 호출
-	outToday(d, t); 
+	outToday(d, t);
 	return 0;
 }

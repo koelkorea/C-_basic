@@ -11,24 +11,24 @@ using namespace std;
 
 class Time {
 
-    private:
-        int hour, min, sec;
+private:
+    int hour, min, sec;
 
-    public:
-        Time(int h, int m, int s) : hour(h), min(m), sec(s) {}
+public:
+    Time(int h, int m, int s) : hour(h), min(m), sec(s) {}
 
-        // (중요) Date class를 Time class의 friend로 선언 (= 앞으로 Date class 객체는 Time클래스의 private 멤버에 맘대로 접근 가능)
-        friend class Date; 
+    // (중요) Date class를 Time class의 friend로 선언 (= 앞으로 Date class 객체는 Time클래스의 private 멤버에 맘대로 접근 가능)
+    friend class Date;
 };
 
 class Date {
 
-    private:
-        int year, month, day;
+private:
+    int year, month, day;
 
-    public:
-        Date(int y, int m, int d) : year(y), month(m), day(d) {}
-        void OutToday(Time& t);
+public:
+    Date(int y, int m, int d) : year(y), month(m), day(d) {}
+    void OutToday(Time& t);
 };
 
 // 이미 Date class는 Time class의 friend로 선언되서, 멤버함수도 Time클래스의 private 멤버에 맘대로 접근 가능 
