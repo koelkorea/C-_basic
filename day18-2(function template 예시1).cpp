@@ -13,10 +13,11 @@
 // 	   
 //          ex) list(initializer_list<Type> IList, const Allocator& Al);
 
-// 함수 템플릿 예시1
+// 함수 템플릿 예시2 - 템플릿 변수(parameter)를 여러개 사용하는 템플릿
 #include <iostream>
 using namespace std;
 
+// 함수 템플릿을 선언할 때, 템플릿 또한 여러개 사용 가능
 template <typename T1, typename T2, typename T3>
 
 void showData(T1 a, T2 b, T3 c) {

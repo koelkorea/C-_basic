@@ -13,25 +13,28 @@
 // 	   
 //          ex) list(initializer_list<Type> IList, const Allocator& Al);
 
-// 함수 템플릿 예시2
+// 함수 템플릿 예시3 - 템플릿 파라미터 팩(대충 템플릿 계의 rest parameter)을 사용하는 템플릿과 재귀함수를 통해 parameter의 갯수에 맞게 내용 무한 출력하기
 #include <iostream>
 using namespace std;
 
 template <typename T>
 
 // 템플릿 기본형 함수
-void print(T n) { 
+void print(T n) {
 	cout << "마지막 인수 1개 => ";
 	cout << n << endl;
 }
 
-// 템플릿 파라미터 팩
-template <typename T1, typename... T2> 
+// 템플릿 파라미터 팩 (템플릿 계의 rest parameter)
+template <typename T1, typename... T2>
 
-// 함수 파리미터 팩
+// 함수 파리미터 팩 (템플릿 파라미터 팩의 내용을 실제 함수의 rest parameter 적용 함수로 만듦)
 void print(T1 arg, T2... args) {
 	cout << "가변인수 => ";
 	cout << arg << endl;
+
+	// 재귀함수를 통해 parameter가 끝날때까지 무한 작동함
+	//  -> 1개가 남을때 상단의 print(n)으로..
 	print(args...);
 }
 

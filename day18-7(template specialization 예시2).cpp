@@ -10,7 +10,7 @@ int GetSize(T data) {
 
 // 템플릿 특수화1 : char* 형에 대해서 특수화
 template < >
-int GetSize <char*>(char* data) { 
+int GetSize <char*>(char* data) {
 	cout << typeid(data).name() << " 타입 함수 템플릿 특수화1\n";
 	return strlen(data) + 1; //data 문자열의 길이를 리턴
 }

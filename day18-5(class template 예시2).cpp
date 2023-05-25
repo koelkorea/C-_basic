@@ -17,12 +17,13 @@
 //          ex2) 컨테이너클래스명 <value자료형> 객체명 = new 컨테이너클래스명(); 형식도 같은 역할 수행
 
 
-//클래스 템플릿 예시2
+//클래스 템플릿 예시2 - 클래스 템플릿 인자가 2개 이상인 경우
 #include <iostream>
 using namespace std;
 
+// 클래스 템플릿
 template <typename T1, typename T2>
-class dosomething{
+class dosomething {
 	private:
 		T1 a;
 		T2 b;
@@ -32,29 +33,31 @@ class dosomething{
 		dosomething(T1 a, T2 b);
 
 		inline T1 getA() const {
-			return a; 
+			return a;
 		}
 
 		inline T2 getB() const {
-			return b; 
+			return b;
 		}
 
 		inline void setA(T1 a) {
-			this->a = a; 
+			this->a = a;
 		}
 
 		inline void setB(T2 b) {
-			this->b = b; 
+			this->b = b;
 		}
 };
 
+// 함수 템플릿
 template <typename T1, typename T2>
 dosomething<T1, T2>::dosomething() : a(0), b(0) {}
 
+// 함수 템플릿
 template <typename T1, typename T2>
 dosomething<T1, T2>::dosomething(T1 a, T2 b) : a(a), b(b) {}
 
-int main(){
+int main() {
 
 	dosomething<int, int> d1(1, 10);
 	cout << "d1 = " << d1.getA() << ", " << d1.getB() << endl;

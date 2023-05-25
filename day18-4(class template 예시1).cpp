@@ -21,6 +21,7 @@
 #include <iostream>
 using namespace std;
 
+// 클래스 템플릿
 template <typename T>
 
 class Dummy {
@@ -32,14 +33,17 @@ class Dummy {
         inline T GetA() const;
 };
 
+// 함수 템플릿
 template <typename T>
 
 Dummy<T>::Dummy(T a) : a(a) {}
 
+// 함수 템플릿
 template <typename T>
 
 inline void Dummy<T>::SetA(T a) { this->a = a; }
 
+// 함수 템플릿
 template <typename T>
 
 inline T Dummy<T>::GetA() const { return a; }
