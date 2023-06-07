@@ -1,18 +1,3 @@
-// 객체지향 패러다임
-//  : 현실 세상에 존재하는 사물과 대상, 그 대상의 행동을 객체로 바라보는 사고를 통해 실체화 하는 프로그래밍적 사고방향
-
-//   # 클래스 (= 객체의 틀)
-//     : 일종의 함수까지 품을 수 있는 확장형 구조체
-//        -> 목적에 따라 대상을 설정하고,
-//            -> 그 대상의 속성 = 멤버변수로 선언하여 추상적인 개념을 수치화 가능하게 설계
-//            -> 그 대상의 동작 = 멤버함수로 선언 및 정의하여, 수치화된 멤버변수 데이터의 연산을 처리할 수 있도록 설계함
-
-//               ex) class Car { private : int enginePower; int numOfWheel; string maker; int stiringPower; public : int accelerate(enginePower){ ... }; void cornering(stiringPower); }
-
-//   # 객체란?
-//     : 1개 이상의 데이터(자료)와 1개 이상의 기능(메소드 : 함수)을 가진 일종의 확장형 구조체 class 자료형을 기반(= 템플릿, 설계도)으로 메모리 상에 만들어진 실체(= instance)
-
-
 // 캡슐화(Encapsulation)
 //  : 객체의 속성(data)과 행위(methods)를 하나로 묶는 행위 (= 클래스 설계)
 //     -> (중요) 이 과정에서 공개할 멤버와 숨길 멤버를 정해둘 수 있음 (= 은닉화) 
@@ -37,3 +22,34 @@
 //                        (= 해당 클래스와 상속관계에 있는 클래스가 선언될 때라면, 해당 멤버변수의 값에 접근 및 변조나 멤버함수의 사용이 가능) 
 //      
 //        - public      : 어디서든 일단 멤버변수나 멤버메서드가 호출되거나 참조되면, 언제라도 해당 멤버변수의 값에 접근 및 변조나 멤버함수의 사용을 허용함 (사실상 자동문임)
+
+
+// getter setter를 통한 캡슐화 구현 예시
+class point {
+
+	// 기본적으로 class의 멤버변수는 접근불가능하게 private로 설정
+	private:
+		int x, y; //x좌표, y좌표
+
+	public:
+		bool init_pos(int x_pos, int y_pos);
+
+		// 멤버변수 참조를 위한 getter
+		int get_x();
+		int get_y();
+
+		// 멤버변수 조작을 위한 setter
+		bool set_x(int x_pos);
+		bool set_y(int y_pos);
+};
+
+int main() {
+
+	// point 객체 생성
+	point pos_1, pos_2; 
+
+	// 객체 생성 후, new 연산자를 통한 class 생성자를 통한 초기화 후 객체data 힙영역에 동적 할당 후, point 객체포인터변수 ptr_pos_1에 시작 위치 대입
+	point* ptr_pos_1 = new point; 
+
+	return 0;
+}
