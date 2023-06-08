@@ -18,6 +18,7 @@
 //  : dangled pointer 이슈 해결 위해, 복사하는 class 객체가 가르키는 주소에 위치한 객체의 메모리 크기만큼의 영역을 따로 떼어 동적 할당하여 객체의 멤버변수들의 내용을 복사하는 방식
 //     -> 이렇게 하면, 복사된 객체는 모든 데이터의 값은 대상 객체와 같더라도, 힙영역에 객체 데이터가 위치한 주소가 다르기에 원본인 대상 객체가 사라져도 영향을 받지 않는 독립성을 유지!
 
+
 //얕은 복사의 문제와 이를 해결한 깊은 복사 코드 (얕은 복사의 dangled pointer 이슈 해결)
 #include <iostream>
 
@@ -25,31 +26,26 @@ using namespace std;
 
 //----------------------------------------[얕은 복사]----------------------------------------------------------------------
 class MyString_swallowCopy {
-    private:
-        char* pStr;
-    public:
-        MyString_swallowCopy(char* p);
-        ~MyString_swallowCopy();
-        MyString_swallowCopy(const MyString_swallowCopy& MyString);
-        void Show() const;
+private:
+    char* pStr;
+public:
+    MyString_swallowCopy(char* p);
+    ~MyString_swallowCopy();
+    void Show() const;
 
 };
 
-MyString_swallowCopy::MyString_swallowCopy(char* p) {//생성자
+// 복사 생성자
+MyString_swallowCopy::MyString_swallowCopy(char* p) {
     pStr = new char[strlen(p) + 1];
     strcpy_s(pStr, strlen(p) + 1, p);
     cout << "생성자 호출\n";
 }
 
-MyString_swallowCopy::~MyString_swallowCopy() {//소멸자
+// 소멸자
+MyString_swallowCopy::~MyString_swallowCopy() {
     delete[]pStr;
     cout << "동적메모리 해제\n";
-}
-
-MyString_swallowCopy::MyString_swallowCopy(const MyString_swallowCopy& string) { //깊은 복사 생성자
-    pStr = new char[strlen(string.pStr) + 1];
-    strcpy_s(pStr, strlen(string.pStr) + 1, string.pStr);
-    cout << "pStr 포인터가 가리키는 동적메모리 모두 복사 -> 깊은 복사 수행하는 복사생성자\n";
 }
 
 void MyString_swallowCopy::Show() const {
@@ -68,16 +64,25 @@ public:
     void Show() const;
 
 };
-MyString_deepCopy::MyString_deepCopy(char* p) {//생성자
+
+// 생성자
+MyString_deepCopy::MyString_deepCopy(char* p) {
     pStr = new char[strlen(p) + 1];
     strcpy_s(pStr, strlen(p) + 1, p);
     cout << "생성자 호출\n";
 }
-MyString_deepCopy::~MyString_deepCopy() {//소멸자
+
+// 소멸자
+MyString_deepCopy::~MyString_deepCopy() {
     delete[]pStr;
     cout << "동적메모리 해제\n";
 }
-MyString_deepCopy::MyString_deepCopy(const MyString_deepCopy& string) { //깊은 복사 생성자
+
+// 깊은 복사 생성자
+//  : 해당 class객체의 레퍼런스 객체를 파라미터로 받는 복사 생성자가 존재하면?
+//     -> 객체 선언시 다른 객체의 값으로 초기화시 해당 복사 생성자 함수가 호출됨 
+//        -> 그 외에 해당 class객체의 멤버함수의 paramter로 해당 객체 자체를 전달하는 경우, call by value를 통해 함수 {}에 값을 전달하기 위해 임의의 class 객체를 만들고 깊은 복사 실행하여 함수내용 실행  
+MyString_deepCopy::MyString_deepCopy(const MyString_deepCopy& string) {
     pStr = new char[strlen(string.pStr) + 1];
     strcpy_s(pStr, strlen(string.pStr) + 1, string.pStr);
     cout << "pStr 포인터가 가리키는 동적메모리 모두 복사 -> 깊은 복사 수행하는 복사생성자\n";
@@ -90,17 +95,25 @@ void MyString_deepCopy::Show() const {
 int main() {
 
     //----------------------------------------[얕은 복사]----------------------------------------------------------------------
-    MyString_swallowCopy s1 = (char*)"Hello World";  //MyString s1((char*)"Hello World");
-    MyString_swallowCopy s2 = (char*)"C++ language"; //MyString s1((char*)"C++ language");
-    MyString_swallowCopy s3 = s1;   //깊은 복사 생성자
+    MyString_swallowCopy s1 = (char*)"Hello World";       // (중요!) s1을 해제할때, s3애서 이미 같은 주소값에 위치한 메모리 영역을 해제하였기에 dangling pointer 로 인한 오류발생
+    MyString_swallowCopy s2 = (char*)"C++ language";
+    MyString_swallowCopy s3 = s1;   // default 복사 생성자 
+
     s1.Show();
     s2.Show();
     s3.Show();
 
     //----------------------------------------[깊은 복사]----------------------------------------------------------------------
-    MyString_deepCopy s4 = (char*)"Hello World";  //MyString s1((char*)"Hello World");
-    MyString_deepCopy s5 = (char*)"C++ language"; //MyString s1((char*)"C++ language");
-    MyString_deepCopy s6 = s4;   //깊은 복사 생성자
+
+    // = MyString s1((char*)"Hello World");
+    MyString_deepCopy s4 = (char*)"Hello World";
+
+    // = MyString s1((char*)"C++ language");
+    MyString_deepCopy s5 = (char*)"C++ language";
+
+    // 깊은 복사 생성자가 호출되어 실행
+    MyString_deepCopy s6 = s4;
+
     s4.Show();
     s5.Show();
     s6.Show();
